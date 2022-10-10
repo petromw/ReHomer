@@ -3,14 +3,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { Component } from 'react';
 import LoginScreen from './components/auth/Login';
 import RegisterScreen from './components/auth/Register';
-import HomePage from './pages/HomePage';
-import WelcomeScreen from './pages/WelcomeScreen';
+import HomePage from './HomePage';
+import WelcomeScreen from './WelcomeScreen';
 import { initializeApp } from 'firebase/app';
 import { View, Text } from 'react-native'
 import { getAuth } from "firebase/auth";
 
 
-
+//TODO replace with .env variables
 const firebaseConfig = {
   apiKey: "AIzaSyByeNafw9TXJNVVmqU_pmA-7gUdAPAUYyU",
   authDomain: "rehomer-8d42c.firebaseapp.com",
@@ -19,7 +19,6 @@ const firebaseConfig = {
   messagingSenderId: "193594662196",
   appId: "1:193594662196:web:4d6766add84de4712f5961",
   measurementId: "G-SDWZMQ4F72"
-
 };
 
 const app = initializeApp(firebaseConfig);
