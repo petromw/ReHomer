@@ -1,13 +1,13 @@
 import {NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { Component } from 'react';
-import LoginScreen from './components/auth/Login';
-import RegisterScreen from './components/auth/Register';
-import HomePage from './HomePage';
-import WelcomeScreen from './WelcomeScreen';
+import LoginScreen from './src/pages/auth/Login';
+import RegisterScreen from './src/pages/auth/Register';
+import HomePage from './src/pages/HomePage';
+import WelcomeScreen from './src/pages/WelcomeScreen';
 import { initializeApp } from 'firebase/app';
 import { View, Text } from 'react-native'
-import { getAuth } from "firebase/auth";
+import { getAuth,onAuthStateChanged } from "firebase/auth";
 
 
 //TODO replace with .env variables
@@ -22,7 +22,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth()
+const auth = getAuth(app)
 
 const Stack = createStackNavigator();
 
@@ -31,11 +31,8 @@ export class App extends Component {
     super()
     this.state = {
       loaded: false,
-      loggedIn: false,
-
     }
   }
-  
 
   componentDidMount() {
     const user = auth.currentUser;
@@ -45,6 +42,8 @@ export class App extends Component {
         loaded: true,
       })
     } else {
+      console.log('user')
+
       this.setState({
         loggedIn: true,
         loaded: true,
@@ -68,7 +67,7 @@ export class App extends Component {
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Welcome">
             <Stack.Screen name={"Welcome"} component={WelcomeScreen}  navigation={this.props.navigation} options={{ headerShown: false }} />
-            <Stack.Screen name="Register" component={RegisterScreen} navigation={this.props.navigation} options={{ headerShown: false }} />
+            <Stack.Screen name="Register" component={RegisterScreen} register={() => this.setState({loggedIn: true, loaded: true,})} navigation={this.props.navigation} options={{ headerShown: false }} />
             <Stack.Screen name="Login" navigation={this.props.navigation} component={LoginScreen} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
@@ -76,7 +75,7 @@ export class App extends Component {
     }
 
     return (
-        <NavigationContainer >
+        <NavigationContainer>
           <Stack.Navigator initialRouteName="Main">
             <Stack.Screen name="Home Page" component={HomePage} navigation={this.props.navigation} />
           </Stack.Navigator>
