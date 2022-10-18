@@ -7,7 +7,10 @@ import HomePage from './src/pages/HomePage';
 import WelcomeScreen from './src/pages/WelcomeScreen';
 import { initializeApp } from 'firebase/app';
 import { View, Text } from 'react-native'
-import { getAuth,onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
+
+import { getFirestore } from "firebase/firestore";
+
 
 
 //TODO replace with .env variables
@@ -53,7 +56,7 @@ const App  = () =>  {
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Welcome">
             <Stack.Screen name={"Welcome"} component={WelcomeScreen}   options={{ headerShown: false }} />
-            <Stack.Screen name="Register" component={RegisterScreen}   options={{ headerShown: false }} >
+            <Stack.Screen name="Register"  options={{ headerShown: false }} >
               {() => <RegisterScreen login={() => setLoggedIn(true)}/>}
 
             </Stack.Screen>
