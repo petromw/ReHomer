@@ -6,14 +6,10 @@ import { getAuth } from "firebase/auth";
 export default function HomePage() {
   const auth = getAuth();
   const user = auth.currentUser;
-
-  useEffect(() => {
-    console.log(user)
-  }, [user])
   
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
-      <Text></Text>
+      <Text>{String(user?.email)}</Text>
     </View>
   )
 }

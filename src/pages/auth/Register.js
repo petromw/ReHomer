@@ -15,12 +15,13 @@ export default function Register(props) {
     const register = async () => {
 
       try {
-        const newUser = await createUserWithEmailAndPassword(auth, email, password)
+        await createUserWithEmailAndPassword(auth, email, password)
         try {
           await updateProfile(auth.currentUser, {
             displayName: name
           })
           signInWithEmailAndPassword(auth, email, password)
+          props.login
         } catch (error) {
           const errorCode = error.code;
           const errorMessage = error.message;
