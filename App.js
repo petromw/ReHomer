@@ -1,6 +1,6 @@
 import {NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { Component } from 'react';
+import React, { useState , useEffect} from 'react';
 import LoginScreen from './src/pages/auth/Login';
 import RegisterScreen from './src/pages/auth/Register';
 import HomePage from './src/pages/HomePage';
@@ -22,38 +22,24 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app)
+const auth = getAuth()
 
 const Stack = createStackNavigator();
 
-export class App extends Component {
-  constructor(props) {
-    super()
-    this.state = {
-      loaded: false,
-    }
-  }
+const App  = () =>  {
+   const [loggedIn, setLoggedIn] = useState(false)
+   const [loaded, setLoaded] = useState(false)
 
-  componentDidMount() {
-    const user = auth.currentUser;
-    if (!user) {
-      this.setState({
-        loggedIn: false,
-        loaded: true,
-      })
+   useEffect(() => {
+    if(auth.currentUser){
+      setLoggedIn(true)
+      setLoaded(true)
     } else {
-      console.log('user')
-
-      this.setState({
-        loggedIn: true,
-        loaded: true,
-      })
+      setLoggedIn(false)
+      setLoaded(true)
     }
-  }
+   }, [auth])
 
-  render() {
-
-    const { loggedIn, loaded } = this.state;
     if (!loaded) {
       return (
         <View>
@@ -66,22 +52,30 @@ export class App extends Component {
       return (
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Welcome">
-            <Stack.Screen name={"Welcome"} component={WelcomeScreen}  navigation={this.props.navigation} options={{ headerShown: false }} />
-            <Stack.Screen name="Register" component={RegisterScreen} register={() => this.setState({loggedIn: true, loaded: true,})} navigation={this.props.navigation} options={{ headerShown: false }} />
-            <Stack.Screen name="Login" navigation={this.props.navigation} component={LoginScreen} options={{ headerShown: false }} />
+            <Stack.Screen name={"Welcome"} component={WelcomeScreen}   options={{ headerShown: false }} />
+            <Stack.Screen name="Register" component={RegisterScreen}   options={{ headerShown: false }} >
+              {() => <RegisterScreen login={() => setLoggedIn(true)}/>}
+
+            </Stack.Screen>
+            <Stack.Screen name="Login"   options={{ headerShown: false }} >
+              {() => <LoginScreen login={() => setLoggedIn(true)}/>}
+            </Stack.Screen>
+
           </Stack.Navigator>
         </NavigationContainer>
       );
-    }
-
-    return (
+    } else if (loggedIn){
+      return (
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Main">
-            <Stack.Screen name="Home Page" component={HomePage} navigation={this.props.navigation} />
+            <Stack.Screen name="Home Page" component={HomePage} />
           </Stack.Navigator>
         </NavigationContainer>
     )
+    }
+
+    
   }
-}
+
 
 export default App
