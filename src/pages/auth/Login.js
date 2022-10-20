@@ -1,6 +1,8 @@
-import { View, Text,TextInput, Button } from 'react-native'
+import { View } from 'react-native'
 import React, {useState} from 'react'
 import { getAuth, signInWithEmailAndPassword  } from "firebase/auth";
+import { Input , Button} from '@rneui/themed';
+
 
 
 
@@ -27,11 +29,11 @@ const Login = (props) =>  {
     <View style={{flex: 1, justifyContent: 'center'}}>
        
                
-                <TextInput
+                <Input
                     placeholder="email"
                     onChangeText={(email) => setEmail(email)}
                 />
-                <TextInput
+                <Input
                     placeholder="password"
                     secureTextEntry={true}
                     onChangeText={(password) => setPassword(password)}

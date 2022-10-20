@@ -1,7 +1,9 @@
-import { View, Text,TextInput, Button } from 'react-native'
+import { View } from 'react-native'
 import React, {useState} from 'react'
 import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword  } from "firebase/auth";
 import { addDoc, collection, getFirestore } from "firebase/firestore"; 
+import { Input , Button} from '@rneui/themed';
+import {useDispatch} from 'react-redux'
 
 export default function Register(props) {
     const db = getFirestore()
@@ -9,6 +11,7 @@ export default function Register(props) {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [error, setError] = useState('')
+    const dispatch = useDispatch()
 
     const auth = getAuth();
     const register = async () => {
@@ -20,8 +23,10 @@ export default function Register(props) {
             const docRef = await addDoc(collection(db, "users"), {
               name,
               email, 
-              userUID: newUser.user.uid
+              userUID: newUser.user.uid,
+              onboardingComplete: false
             });
+
             props.login()
 
             console.log("Document written with ID: ", docRef.id);
@@ -38,20 +43,20 @@ export default function Register(props) {
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
        
-                <TextInput
+                <Input
                     placeholder="name"
                     onChangeText={(name) => setName(name)}
                 />
-                <TextInput
+                <Input
                     placeholder="email"
                     onChangeText={(email) => setEmail(email)}
                 />
-                <TextInput
+                <Input
                     placeholder="password"
                     secureTextEntry={true}
                     onChangeText={(password) => setPassword(password)}
                 />
-                <Button title={'Register'} onPress={() => register()}/>
+                <Button containerStyle={{width: 100}}  title={'Register'} onPress={() => register()}/>
     </View>
   )
 }
