@@ -4,6 +4,8 @@ import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithEmail
 import { addDoc, collection, getFirestore } from "firebase/firestore"; 
 import { Input , Button} from '@rneui/themed';
 import {useDispatch} from 'react-redux'
+import { setUid } from '../../redux/userSlice';
+
 
 export default function Register(props) {
     const db = getFirestore()
@@ -18,17 +20,15 @@ export default function Register(props) {
 
       try {
         const newUser = await createUserWithEmailAndPassword(auth, email, password)
-        console.log(Object.keys(newUser), newUser.user.uid)
           try {
             const docRef = await addDoc(collection(db, "users"), {
               name,
               email, 
               userUID: newUser.user.uid,
-              onboardingComplete: false
+              onboardingComplete: false,
+              type: ''
             });
-
-            props.login()
-
+            dispatch(setUid(docRef.id))
             console.log("Document written with ID: ", docRef.id);
           } catch (e) {
             console.error("Error adding document: ", e);

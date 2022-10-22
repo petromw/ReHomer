@@ -3,9 +3,6 @@ import React, {useState} from 'react'
 import { getAuth, signInWithEmailAndPassword  } from "firebase/auth";
 import { Input , Button} from '@rneui/themed';
 
-
-
-
 const Login = (props) =>  {
 
     const [email, setEmail] = useState('');
@@ -16,7 +13,6 @@ const Login = (props) =>  {
     const register = async () => {
         try {
           await signInWithEmailAndPassword(auth, email, password)
-          props.login()
         } catch (error) {
           const errorCode = error.code;
           const errorMessage = error.message;

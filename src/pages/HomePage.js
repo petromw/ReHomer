@@ -8,13 +8,11 @@ import { Button } from '@rneui/themed';
 
 
 export default function HomePage() {
-  const auth = getAuth();
-  const user = useSelector((state) => state.user.user)
-  // const user = auth.currentUser;
+  const user = useSelector((state) => state.user)
 
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
-      <Text>{String(user?.email)}</Text>
+      <Text>{String(user.user)}</Text>
     </View>
   )
 }
