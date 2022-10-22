@@ -13,10 +13,9 @@ import { ThemeProvider, Button, createTheme } from '@rneui/themed';
 import store from './src/redux/store'
 import { Provider } from 'react-redux'
 
-const theme = createTheme({
-  components: {
 
-  },
+const theme = createTheme({
+  components: {},
 });
 
 //TODO replace with .env variables
