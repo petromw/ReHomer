@@ -1,3 +1,4 @@
+
 import { View, Text } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { getAuth } from "firebase/auth";
@@ -7,12 +8,12 @@ import { Button } from '@rneui/themed';
 
 
 
-export default function HomePage() {
+export default function Profile() {
   const user = useSelector((state) => state.user)
 
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Home</Text>
+      <Text>Profile</Text>
     </View>
   )
 }

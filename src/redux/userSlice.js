@@ -17,10 +17,13 @@ export const userSlice = createSlice({
     setUid: (state,action) => {
       state.uid = action.payload
     },
+    completeOnboardingReduxAction: (state, action) => {
+      state.user.onboardingComplete = action.payload
+    }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setUser , setLoggedIn, setUid} = userSlice.actions
+export const { setUser , setLoggedIn, setUid, completeOnboardingReduxAction} = userSlice.actions
 
 export default userSlice.reducer

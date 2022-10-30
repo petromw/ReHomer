@@ -12,11 +12,13 @@ import { setLoggedIn, setUser } from './src/redux/userSlice';
 import {useDispatch} from 'react-redux'
 import { collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
 import OnBoarding from './src/pages/Onboarding';
-
-
-
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Profile from './src/pages/ProfilePage';
 
 const Stack = createStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
+
 const Main  = () =>  {
     const selectUser = useSelector((state) => state.user.user)
     const loggedIn = useSelector((state) => state.user.loggedIn)
@@ -25,10 +27,10 @@ const Main  = () =>  {
     const db = getFirestore()
 
     const auth = getAuth();
+    // auth.signOut()
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         dispatch(setLoggedIn(true))
-        console.log('selected user', selectUser)
         const uid = user.uid;
         try {
           const users = await getDocs(query(collection(db, 'users'), where('userUID', '==', uid )))
@@ -44,21 +46,19 @@ const Main  = () =>  {
         }
       } else {
         dispatch(setLoggedIn(false))
-        console.log('No user found')
       }
     });
 
      if(!loggedIn){
       return (
          <NavigationContainer>
-              <Stack.Navigator initialRouteName="Welcome">
-                <Stack.Screen name={"Welcome"} component={WelcomeScreen}   options={{ headerShown: false }} />
+              <Stack.Navigator initialRouteName="Register">
                 <Stack.Screen name="Register"  options={{ headerShown: false }} >
-                  {() => <RegisterScreen/>}
+                  {(props) => <RegisterScreen {...props}/>}
 
                 </Stack.Screen>
                 <Stack.Screen name="Login"   options={{ headerShown: false }} >
-                  {() => <LoginScreen/>}
+                  {(props) => <LoginScreen {...props}/>}
                 </Stack.Screen>
               </Stack.Navigator>
           </NavigationContainer>
@@ -66,17 +66,36 @@ const Main  = () =>  {
     } else if(loggedIn){
       if(selectUser?.onboardingComplete){
         return (
-          <NavigationContainer>
-          <Stack.Navigator initialRouteName="Main">
-            <Stack.Screen name="Home Page" component={HomePage} />
-          </Stack.Navigator>
+        <NavigationContainer>
+          <Tab.Navigator barStyle={{backgroundColor: '#4d4365'}}  initialRouteName="Home">
+            <Tab.Screen  
+              options={{
+                tabBarLabel: '',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="home" color={'#fff'} size={26} />
+                ),
+                }} 
+              name="Home" 
+              component={HomePage} 
+            />
+            <Tab.Screen  
+              options={{
+                tabBarLabel: '',
+                tabBarIcon: () => (
+                  <MaterialCommunityIcons name="account" color={'#fff'} size={26} />
+                ),
+                }} 
+              name="Profile" 
+              component={Profile} 
+            />
+          </Tab.Navigator>
         </NavigationContainer>
         )
       } else {
         return (
           <NavigationContainer>
           <Stack.Navigator initialRouteName="Main">
-            <Stack.Screen name="Onboarding" component={OnBoarding} />
+            <Stack.Screen options={{ headerShown: false }} name="Onboarding" component={OnBoarding} />
           </Stack.Navigator>
         </NavigationContainer>
         )
