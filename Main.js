@@ -6,11 +6,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/pages/auth/Login';
 import RegisterScreen from './src/pages/auth/Register';
 import HomePage from './src/pages/HomePage';
-import WelcomeScreen from './src/pages/WelcomeScreen';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setLoggedIn, setUser } from './src/redux/userSlice';
 import {useDispatch} from 'react-redux'
-import { collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import OnBoarding from './src/pages/Onboarding';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
