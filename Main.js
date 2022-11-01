@@ -7,7 +7,7 @@ import LoginScreen from './src/pages/auth/Login';
 import RegisterScreen from './src/pages/auth/Register';
 import HomePage from './src/pages/HomePage';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { setLoggedIn, setUser } from './src/redux/userSlice';
+import { setLoggedIn, setUid, setUser } from './src/redux/userSlice';
 import {useDispatch} from 'react-redux'
 import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import OnBoarding from './src/pages/Onboarding';
@@ -32,10 +32,12 @@ const Main  = () =>  {
         dispatch(setLoggedIn(true))
         const uid = user.uid;
         try {
+          console.log(uid)
           const users = await getDocs(query(collection(db, 'users'), where('userUID', '==', uid )))
           users.forEach((doc) => {
             if(doc.data().userUID === uid){
               if(!selectUser.email){
+                dispatch(setUid(uid))
                 dispatch(setUser(doc.data()))
               }
             }

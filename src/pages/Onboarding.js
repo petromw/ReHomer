@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 import { useSelector, useDispatch } from 'react-redux'
 import { completeOnboardingReduxAction } from '../redux/userSlice'
 import { Button, Input } from '@rneui/themed';
-import { collection, doc, getDocs, getFirestore, query, runTransaction, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getFirestore, query, runTransaction, where } from 'firebase/firestore';
 import { Card, Switch } from '@rneui/base';
 import { Divider } from 'react-native-paper';
 import DropdownComponent from '../components/DropDownSelect';
@@ -52,11 +52,17 @@ export default function OnBoarding() {
       console.log("Transaction failed: ", e);
     }
   }
+  console.log(uid)
 
-  const updatePet = async () => {
+  const createPet = async () => {
     try {
+        const docRef = await addDoc(collection(db, "pet"), {
+          name: petName,
+          species: petSpecies
+        });
+        
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { pet: {name: petName, species: petSpecies} });
+        transaction.set(doc(db, "users", uid), { pet: {docRef} });
       });
       
       console.log("Transaction successfully committed!");
@@ -65,16 +71,13 @@ export default function OnBoarding() {
     }
   }
 
-  useEffect(() => {
-    updatePet()
-  }, [petName, petSpecies])
-
   const completeOnboarding = async () => {
+    if(step === 2) createPet()
     if(step < totalSteps) {
       setStep(step + 1)
     } else {
-      console.log({pet: {name: petName, species: petSpecies}}) 
       try {
+        createPet()
         await runTransaction(db, async (transaction) => {
           transaction.update(doc(db, "users", uid), { onboardingComplete: true });
         });
@@ -143,8 +146,8 @@ export default function OnBoarding() {
                selectionColor={'#0f0d14'}
                underlineColorAndroid={'#0f0d14'}
                onChangeText={(name) => setPetName(name)}
-               onBlur={() => updatePet()}
              />
+             <Text>And what type of animal is your pet?</Text>
             <DropdownComponent value={petSpecies} setValue={(value) => setPetSpecies(value)} 
               data={[
                       { label: 'Cat', value: 'Cat' },
