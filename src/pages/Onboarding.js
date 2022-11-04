@@ -6,8 +6,9 @@ import { completeOnboardingReduxAction } from '../redux/userSlice'
 import { Button, Input } from '@rneui/themed';
 import { addDoc, collection, doc, getDocs, getFirestore, query, runTransaction, where } from 'firebase/firestore';
 import { Card, Switch } from '@rneui/base';
-import { Divider } from 'react-native-paper';
+import { Divider, RadioButton } from 'react-native-paper';
 import DropdownComponent from '../components/DropDownSelect';
+import CustomRadioButton from '../components/CustomRadioButton';
 
 
 
@@ -90,15 +91,15 @@ export default function OnBoarding() {
     
   }
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d4365', padding: 25}}>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550', padding: 25}}>
       <Text style={{position: 'absolute', right: 50, top: 50}}>{step + 1} / {totalSteps + 1} </Text>
       {step === 0 &&
         <View>
-          <Text style={{fontSize: 20, color: '#0f0d14', textAlign: 'center'}}>We just need a little more information to get you started.</Text>
+          <Text style={{fontSize: 45, color: '#0f0d14'}}>What is your name?</Text>
           <View style={{justifyContent: 'center', marginTop: 25}}>
             <Input
               value={name}
-              label='What is your name?'
+              label='This is how your name will display to other users'
               labelStyle={{color:'#0f0d14' }}
               placeholderTextColor={'#0f0d14'}
               selectionColor={'#0f0d14'}
@@ -110,30 +111,10 @@ export default function OnBoarding() {
         </View>
         }
         {step === 1 && 
-          <View style={{display: 'flex', marginVertical: 10,flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-             <View style={{display: 'flex', flex: 1, backgroundColor: type === 'Adoptor' ? '#ffffff10' : '#ffffff00', borderRadius: 15}}>
-            <Text onPress={() => 
-                  {
-                    if(type === 'Adoptee'){
-                      setType('Adoptor')
-                    } else {
-                      setType('Adoptee')
-                    }
-                  }
-                }  style={{fontSize: type === 'Adoptor' ? 30 : 20,fontWeight: type === 'Adoptor' ? '600' : 'normal', textAlign: 'center'}}>Looking to adopt</Text>
-             </View>
-             <View style={{display: 'flex', flex: 1, backgroundColor: type === 'Adoptee' ? '#ffffff10' : '#ffffff00', borderRadius: 15}}>
-
-             <Text onPress={() => 
-                  {
-                    if(type === 'Adoptee'){
-                      setType('Adoptor')
-                    } else {
-                      setType('Adoptee')
-                    }
-                  }
-                }  style={{fontSize: type === 'Adoptee' ? 30 : 20,fontWeight: type === 'Adoptee' ? '600' : 'normal', textAlign: 'center'}}>Looking to ReHome</Text>
-            </View>
+          <View>
+            <Text style={{fontSize: 35, color: '#0f0d14', marginBottom: 25}}>Are you looking to adopt a pet (adoptor) or to rehome your pet (adoptee)</Text>
+            <CustomRadioButton onPress={() => setType('Adoptor')} title={'Adoptor'} checked={type === 'Adoptor'}/>
+            <CustomRadioButton onPress={() => setType('Adoptee')} title={'Adoptee'} checked={type === 'Adoptee'}/>
           </View>
           }
           {step === 2 && 
@@ -148,11 +129,15 @@ export default function OnBoarding() {
                onChangeText={(name) => setPetName(name)}
              />
              <Text>And what type of animal is your pet?</Text>
-            <DropdownComponent value={petSpecies} setValue={(value) => setPetSpecies(value)} 
+            {/* <DropdownComponent value={petSpecies} setValue={(value) => setPetSpecies(value)} 
               data={[
                       { label: 'Cat', value: 'Cat' },
                       { label: 'Dog', value: 'Dog' },
-                      { label: 'Bird', value: 'Bird' },]}/>
+                      { label: 'Bird', value: 'Bird' },]}/> */}
+              <CustomRadioButton onPress={() => setPetSpecies('Cat')} title={'Cat'} checked={petSpecies === 'Cat'}/>
+              <CustomRadioButton onPress={() => setPetSpecies('Dog')} title={'Dog'} checked={petSpecies === 'Dog'}/>
+              <CustomRadioButton onPress={() => setPetSpecies('Bird')} title={'Bird'} checked={petSpecies === 'Bird'}/>
+
            </View>
           }
           <Button 
