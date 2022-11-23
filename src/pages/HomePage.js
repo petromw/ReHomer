@@ -8,8 +8,13 @@ import { Button } from '@rneui/themed';
 
 
 export default function HomePage() {
+  
   const user = useSelector((state) => state.user)
 
+  useEffect(() => {
+    console.log(user)
+  }, [user])
+  
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <Text>Home</Text>

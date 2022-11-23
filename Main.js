@@ -32,18 +32,18 @@ const Main  = () =>  {
         dispatch(setLoggedIn(true))
         const uid = user.uid;
         try {
-          console.log(uid)
           const users = await getDocs(query(collection(db, 'users'), where('userUID', '==', uid )))
           users.forEach((doc) => {
             if(doc.data().userUID === uid){
               if(!selectUser.email){
-                dispatch(setUid(uid))
+
+                dispatch(setUid(doc.id))
                 dispatch(setUser(doc.data()))
               }
             }
           })
         } catch (error) {
-          console.log('User not found',error)
+          console.error('User not found',error)
         }
       } else {
         dispatch(setLoggedIn(false))
