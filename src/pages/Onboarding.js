@@ -115,7 +115,7 @@ export default function OnBoarding() {
       const petImages = (user?.pet?.images && user?.pet?.images?.length) > 0 ? [].concat(user.pet.images).concat(result.uri) : [result.uri]
       console.log(petImages)
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages} });
+        transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages, profileImage: petImages[0]} });
       });
 
       dispatch(setUser({...user, pet: {...user.pet, images: petImages}} ))

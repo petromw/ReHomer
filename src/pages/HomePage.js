@@ -14,7 +14,6 @@ export default function HomePage() {
   useEffect(() => {
     console.log(user)
   }, [user])
-  
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <Text>Home</Text>
