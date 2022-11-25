@@ -146,6 +146,12 @@ export default function OnBoarding() {
             title={'Continue'} 
             onPress={() => completeOnboarding()}
           />
+          <Button 
+            color={'#4d4365'}
+            containerStyle={{width: 100, alignSelf: 'center', marginTop: 20}}  
+            title={'Map'} 
+            onPress={() => completeOnboarding()}
+          />
         
       
     </View>
