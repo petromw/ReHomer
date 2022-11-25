@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import LoginScreen from './src/pages/auth/Login';
 import RegisterScreen from './src/pages/auth/Register';
-import HomePage from './src/pages/HomePage';
+import HomePage from './src/pages/home/HomePage';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setLoggedIn, setUid, setUser } from './src/redux/userSlice';
 import {useDispatch} from 'react-redux'
