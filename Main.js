@@ -13,7 +13,7 @@ import { collection, getDocs, getFirestore, query, where } from "firebase/firest
 import OnBoarding from './src/pages/Onboarding';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Profile from './src/pages/ProfilePage';
+import Profile from './src/pages/profile/ProfilePage';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -21,6 +21,7 @@ const Tab = createMaterialBottomTabNavigator();
 const Main  = () =>  {
     const selectUser = useSelector((state) => state.user.user)
     const loggedIn = useSelector((state) => state.user.loggedIn)
+    const [loading, setLoading] = useState(true)
 
     const dispatch = useDispatch()
     const db = getFirestore()
@@ -32,21 +33,24 @@ const Main  = () =>  {
         dispatch(setLoggedIn(true))
         const uid = user.uid;
         try {
-          console.log(uid)
           const users = await getDocs(query(collection(db, 'users'), where('userUID', '==', uid )))
           users.forEach((doc) => {
             if(doc.data().userUID === uid){
               if(!selectUser.email){
-                dispatch(setUid(uid))
+
+                dispatch(setUid(doc.id))
                 dispatch(setUser(doc.data()))
               }
             }
           })
         } catch (error) {
-          console.log('User not found',error)
+          console.error('User not found',error)
+        } finally {
+          setLoading(false)
         }
       } else {
         dispatch(setLoggedIn(false))
+        setLoading(false)
       }
     });
 

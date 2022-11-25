@@ -43,21 +43,21 @@ export default function Register(props) {
       }
     }
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d4365'}}>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550'}}>
       <Card containerStyle={{minWidth: '85%', backgroundColor: '#ffffff65'}}>
         <Card.Title style={{fontSize: 25, color: '#0f0d14'}}>Welcome to ReHomer!</Card.Title>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <Input
             placeholderTextColor={'#0f0d14'}
             selectionColor={'#0f0d14'}
-            underlineColorAndroid={'#0f0d14'}
+            // underlineColorAndroid={'#0f0d14'}
             placeholder="Email"
             onChangeText={(email) => setEmail(email)}
           />
           <Input
             placeholderTextColor={'#0f0d14'}
             selectionColor={'#0f0d14'}
-            underlineColorAndroid={'#0f0d14'}
+            // underlineColorAndroid={'#0f0d14'}
             placeholder="Password"
             secureTextEntry={true}
             onChangeText={(password) => setPassword(password)}

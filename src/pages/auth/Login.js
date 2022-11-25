@@ -23,7 +23,7 @@ const Login = (props) =>  {
     }
 
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d4365'}}>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550'}}>
       <Card containerStyle={{minWidth: '85%', backgroundColor: '#ffffff65'}}>
         <Card.Title style={{fontSize: 25, color: '#0f0d14'}}>Sign In</Card.Title>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
