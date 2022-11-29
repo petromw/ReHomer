@@ -8,6 +8,7 @@ import { Input } from '@rneui/base'
 import { Checkbox, Text, StyleSheet, View } from 'react-native'
 import Slider from '@rneui/base'
 
+
 export default function UpdateUserProfile() {
     const user = useSelector((state) => state.user)
     const [range,setRange] = useState(0)
