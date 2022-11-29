@@ -1,3 +1,4 @@
+import { getAuth } from 'firebase/auth';
 import React, { Component } from 'react';
 import {
   StyleSheet,
@@ -6,6 +7,7 @@ import {
   Image,
   TouchableOpacity
 } from 'react-native';
+import { Button, IconButton } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg'
 
@@ -14,12 +16,30 @@ import blankProfile from '../../assets/blankProfile.jpg'
 export default function AdopteeProfile() {
   const user = useSelector((state) => state.user.user)
   const profileImage = user?.pet?.profileImage ? {uri: user?.pet?.profileImage} : blankProfile
-  console.log('=========', {uri: user.pet})
+
+  const auth = getAuth();
+
 
   return (
     <View style={styles.container}>
-          <View style={styles.header}/>
+          <View style={styles.header}>
+            {/* <View style={{ marginTop: '15%', alignSelf: 'flex-end', marginRight: '5%'}}>
+              <IconButton size={50} mode={'contained'} color={'#000000'} icon={'account'}/>
+            </View> */}
+            
+          </View>
           <Image style={styles.avatar} source={profileImage} />
+          <View style={styles.bodyContent}>
+            <Text style={styles.name}>{user?.name}</Text>
+            
+            
+          </View>
+
+          <View style={{marginTop: '85%', width: '75%', alignSelf: 'center'}}>
+              <Button mode='contained' onPress={() => auth.signOut()}>
+                Sign Out
+              </Button>
+            </View>
       </View>
   )
 }
@@ -41,15 +61,12 @@ const styles = StyleSheet.create({
     marginTop:130
   },
   name:{
-    fontSize:22,
-    color:"#00000050",
+    fontSize:500,
+    color:"#000000",
     fontWeight:'600',
   },
-  body:{
-    marginTop:40,
-  },
   bodyContent: {
-    flex: 1,
+    marginTop:40,
     alignItems: 'center',
     padding:30,
   },
