@@ -14,6 +14,7 @@ import OnBoarding from './src/pages/Onboarding';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Profile from './src/pages/profile/ProfilePage';
+import MessagePage from './src/pages/messages/MessagePage';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -87,12 +88,23 @@ const Main  = () =>  {
               options={{
                 tabBarLabel: '',
                 tabBarIcon: () => (
+                  <MaterialCommunityIcons name="chat" color={'#fff'} size={26} />
+                ),
+                }} 
+              name="Messages" 
+              component={MessagePage} 
+            />
+            <Tab.Screen  
+              options={{
+                tabBarLabel: '',
+                tabBarIcon: () => (
                   <MaterialCommunityIcons name="account" color={'#fff'} size={26} />
                 ),
                 }} 
               name="Profile" 
               component={Profile} 
             />
+           
           </Tab.Navigator>
         </NavigationContainer>
         )

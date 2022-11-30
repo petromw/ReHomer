@@ -84,6 +84,7 @@ export default function OnBoarding() {
     } else {
       try {
         if(type !== 'Adoptee'){
+          updateUser(type)
           await runTransaction(db, async (transaction) => {
             transaction.update(doc(db, "users", uid), { adoptorFields: adoptorFields});
           });

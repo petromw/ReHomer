@@ -7,6 +7,7 @@ import { Button } from '@rneui/themed';
 import { useMemo } from 'react';
 import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import { async } from '@firebase/util';
+import { IconButton } from 'react-native-paper';
 
 
 
@@ -47,11 +48,36 @@ export default function AdopteeHomePage() {
   useEffect(() => {
     console.log(otherUserProfiles)
   }, [otherUserProfiles])
+
+  
+  const likeUser = () => {
+    console.log('like', otherUserProfiles[index])
+    setIndex(index + 1)
+
+  }
+
+  const disLikeUser = () => {
+    console.log('dislike', otherUserProfiles[index])
+    setIndex(index + 1)
+  }
+
+  if(index > otherUserProfiles.length - 1){
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>No more Profiles. Please try again later</Text>        
+      </View>
+    )
+  }
   
   return (
-    <View style={{flex: 1, alignItems: 'center', marginTop: '25%'}}>
+    <View style={{flex: 1, justifyContent: 'space-between', alignItems: 'center', marginTop: '25%', marginBottom: '5%'}}>
       <Text style={{fontSize: 24}}>{otherUserProfiles[index]?.name}</Text>
-      {/* <Text style={{fontSize: 24}}>{otherUserProfiles[index]}</Text> */}
+      <Text style={{fontSize: 22, textAlign: 'center', marginTop: 25}}>Has a {otherUserProfiles[index]?.adoptorFields?.houseType}</Text>
+      <Text style={{fontSize: 22, textAlign: 'center', marginTop: 25}}>with {otherUserProfiles[index]?.adoptorFields?.familyType}</Text>
+      <View style={{display: 'flex', flexDirection: 'row'}}>
+        <IconButton onPress={() =>  disLikeUser(otherUserProfiles[index])} icon={'thumb-down'} size={50} mode={'contained'} iconColor={'#ff000075'}/>
+        <IconButton onPress={() =>  likeUser(otherUserProfiles[index])} icon={'star'} size={50} mode={'contained'}/>
+      </View>
     </View>
   )
 }

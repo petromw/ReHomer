@@ -44,10 +44,6 @@ export default function AdoptorHomePage() {
     load()
   }, [db])
 
-  useEffect(() => {
-    console.log(otherUserProfiles)
-  }, [otherUserProfiles])
-
   const likeUser = () => {
     console.log('like', otherUserProfiles[index])
     setIndex(index + 1)
@@ -59,7 +55,7 @@ export default function AdoptorHomePage() {
     setIndex(index + 1)
   }
 
-  if(index > otherUserProfiles.length){
+  if(index > otherUserProfiles.length - 1){
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Text>No more Profiles. Please try again later</Text>        
@@ -72,6 +68,7 @@ export default function AdoptorHomePage() {
       <View>
         <Text style={{fontSize: 24}}>Owner: {otherUserProfiles[index]?.name}</Text>
         <Text style={{fontSize: 24}}>Pet: {otherUserProfiles[index]?.pet?.name}</Text>
+        <Text style={{fontSize: 24}}>Species: {otherUserProfiles[index]?.pet?.species}</Text>
       </View>
       <View>
         <Image 
