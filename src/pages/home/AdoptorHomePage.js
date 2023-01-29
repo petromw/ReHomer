@@ -67,7 +67,6 @@ export default function AdoptorHomePage() {
       await runTransaction(db, async (transaction) => {
         transaction.update(doc(db, "users", user.uid), { likedProfiles});
       });
-      // dispatch(setUser({...user, likedProfiles}))
       console.log("Transaction likeUser successfully committed!");
       setIndex(index + 1)
     } catch (e) {

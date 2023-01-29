@@ -15,6 +15,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Profile from './src/pages/profile/ProfilePage';
 import MessagePage from './src/pages/messages/MessagePage';
+import {
+  StatusBar,
+} from 'react-native';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -63,6 +66,7 @@ const Main  = () =>  {
      if(!loggedIn){
       return (
          <NavigationContainer>
+      
               <Stack.Navigator initialRouteName="Register">
                 <Stack.Screen name="Register"  options={{ headerShown: false }} >
                   {(props) => <RegisterScreen {...props}/>}
