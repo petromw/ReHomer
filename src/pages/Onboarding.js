@@ -129,13 +129,6 @@ export default function OnBoarding() {
 
 
   };
-
-
-  useEffect(() => {
-    console.log('with', {...user, pet: {...user.pet, images: [user?.pet?.images]}  })
-
-    console.log(user)
-  }, [user])
   
   
 

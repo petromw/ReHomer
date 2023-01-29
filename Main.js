@@ -27,6 +27,10 @@ const Main  = () =>  {
     const dispatch = useDispatch()
     const db = getFirestore()
 
+    useEffect(() => {
+      console.log({liked: selectUser.likedProfiles})
+    }, [selectUser])
+
     const auth = getAuth();
     // auth.signOut()
     onAuthStateChanged(auth, async (user) => {
@@ -41,6 +45,7 @@ const Main  = () =>  {
 
                 dispatch(setUid(doc.id))
                 dispatch(setUser(doc.data()))
+                console.log(doc.data().likedProfiles)
               }
             }
           })

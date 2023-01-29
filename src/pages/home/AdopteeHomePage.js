@@ -4,9 +4,7 @@ import { getAuth } from "firebase/auth";
 import { useSelector, useDispatch } from 'react-redux'
 import { decrement, increment } from '../../redux/userSlice'
 import { Button } from '@rneui/themed';
-import { useMemo } from 'react';
 import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
-import { async } from '@firebase/util';
 import { IconButton } from 'react-native-paper';
 
 
@@ -45,15 +43,10 @@ export default function AdopteeHomePage() {
     load()
   }, [db])
 
-  useEffect(() => {
-    console.log(otherUserProfiles)
-  }, [otherUserProfiles])
-
   
   const likeUser = () => {
     console.log('like', otherUserProfiles[index])
     setIndex(index + 1)
-
   }
 
   const disLikeUser = () => {
