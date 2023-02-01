@@ -13,6 +13,7 @@ import AdoptorProfile from './AdoptorProfilePage';
 export default function Profile() {
   const user = useSelector((state) => state.user)
 
+  
   return (
     <View style={{flex: 1}}>
       {user.user.type === 'Adoptee' 

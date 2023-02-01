@@ -13,7 +13,7 @@ import { collection, getDocs, getFirestore, query, where } from "firebase/firest
 import OnBoarding from './src/pages/Onboarding';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Profile from './src/pages/profile/ProfilePage';
+import Profile from './src/pages/profile/ProfilePageWrapper';
 import MessagePage from './src/pages/messages/MessagePage';
 import {
   StatusBar,
