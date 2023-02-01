@@ -1,5 +1,5 @@
 import { getAuth } from 'firebase/auth';
-import React, { useState , useEffect} from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,37 +10,15 @@ import {
 import { Button, IconButton } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg'
-import { Input } from '@rneui/themed';
 
 
 
-
-export default function AdopteeProfile() {
+export default function AdoptorProfile() {
   const user = useSelector((state) => state.user.user)
-  const selectName = useSelector((state) => state.user.name)
+  const profileImage = user?.profileImage ? {uri: user?.profileImage} : blankProfile
 
-  const uid =  useSelector((state) => state.user.uid)
-  const profileImage = user?.pet?.profileImage ? {uri: user?.pet?.profileImage} : blankProfile
-
-  const [name, setName] = useState('')
-  const [editable, setEditable] = useState(false)
   const auth = getAuth();
 
-  useEffect(() => {
-    setName(selectName)
-  }, [])
-
-  const updateUser = async () => {
-    try {
-      await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { name: name });
-      });
-      dispatch(setUser({...user, type: type}))
-      console.log("Transaction successfully committed!");
-    } catch (e) {
-      console.error("Transaction failed: ", e);
-    }
-  }
 
   return (
     <View style={styles.container}>
@@ -52,26 +30,9 @@ export default function AdopteeProfile() {
           </View>
           <Image style={styles.avatar} source={profileImage} />
           <View style={styles.bodyContent}>
-            {editable ?            
-         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <Input
-                  value={name}
-                  defaultValue={name}
-                  labelStyle={{color:'#0f0d14' }}
-                  placeholderTextColor={'#0f0d14'}
-                  selectionColor={'#0f0d14'}
-                  underlineColorAndroid={'#0f0d14'}
-                  onChangeText={(name) => setName(name)}
-                  onBlur={() => updateUser()}
-                />
-                <IconButton onPress={() => setEditable(!editable)}  size={15} mode={'outlined'} color={'#000000'} icon={'edit'}/>
-                </View>
-          : 
-          <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
             <Text style={styles.name}>{user?.name}</Text>
-            <IconButton onPress={() => setEditable(!editable)}  size={20}  color={'#000000'} icon={'pencil'}/>
-          </View>
-          }
+            
+            
           </View>
 
           <View style={{marginTop: '85%', width: '75%', alignSelf: 'center'}}>

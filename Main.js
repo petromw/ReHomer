@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import LoginScreen from './src/pages/auth/Login';
 import RegisterScreen from './src/pages/auth/Register';
-import HomePage from './src/pages/HomePage';
+import HomePage from './src/pages/home/HomePage';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setLoggedIn, setUid, setUser } from './src/redux/userSlice';
 import {useDispatch} from 'react-redux'
@@ -13,7 +13,11 @@ import { collection, getDocs, getFirestore, query, where } from "firebase/firest
 import OnBoarding from './src/pages/Onboarding';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Profile from './src/pages/profile/ProfilePage';
+import Profile from './src/pages/profile/ProfilePageWrapper';
+import MessagePage from './src/pages/messages/MessagePage';
+import {
+  StatusBar,
+} from 'react-native';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -25,6 +29,10 @@ const Main  = () =>  {
 
     const dispatch = useDispatch()
     const db = getFirestore()
+
+    useEffect(() => {
+      console.log({liked: selectUser.likedProfiles})
+    }, [selectUser])
 
     const auth = getAuth();
     // auth.signOut()
@@ -40,6 +48,7 @@ const Main  = () =>  {
 
                 dispatch(setUid(doc.id))
                 dispatch(setUser(doc.data()))
+                console.log(doc.data().likedProfiles)
               }
             }
           })
@@ -57,6 +66,7 @@ const Main  = () =>  {
      if(!loggedIn){
       return (
          <NavigationContainer>
+      
               <Stack.Navigator initialRouteName="Register">
                 <Stack.Screen name="Register"  options={{ headerShown: false }} >
                   {(props) => <RegisterScreen {...props}/>}
@@ -87,12 +97,23 @@ const Main  = () =>  {
               options={{
                 tabBarLabel: '',
                 tabBarIcon: () => (
+                  <MaterialCommunityIcons name="chat" color={'#fff'} size={26} />
+                ),
+                }} 
+              name="Messages" 
+              component={MessagePage} 
+            />
+            <Tab.Screen  
+              options={{
+                tabBarLabel: '',
+                tabBarIcon: () => (
                   <MaterialCommunityIcons name="account" color={'#fff'} size={26} />
                 ),
                 }} 
               name="Profile" 
               component={Profile} 
             />
+           
           </Tab.Navigator>
         </NavigationContainer>
         )

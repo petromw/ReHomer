@@ -84,6 +84,7 @@ export default function OnBoarding() {
     } else {
       try {
         if(type !== 'Adoptee'){
+          updateUser(type)
           await runTransaction(db, async (transaction) => {
             transaction.update(doc(db, "users", uid), { adoptorFields: adoptorFields});
           });
@@ -128,13 +129,6 @@ export default function OnBoarding() {
 
 
   };
-
-
-  useEffect(() => {
-    console.log('with', {...user, pet: {...user.pet, images: [user?.pet?.images]}  })
-
-    console.log(user)
-  }, [user])
   
   
 
