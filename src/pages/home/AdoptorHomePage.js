@@ -2,17 +2,18 @@ import { View, Text, Image } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { collection, getDocs, getFirestore, query, where, runTransaction, doc} from "firebase/firestore";
-import { IconButton } from 'react-native-paper'
+import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
 
 
 
 
 
-export default function AdoptorHomePage() {
+export default function AdoptorHomePage(props) {
   
   const user = useSelector((state) => state.user)
   const dispatch = useDispatch()
+  const navigation = props.navigation
 
   const db = getFirestore()
 
@@ -97,31 +98,34 @@ export default function AdoptorHomePage() {
   }
   
   return (
-    <View style={{flex: 1, justifyContent: 'space-between', alignItems: 'center', marginTop: '25%', marginBottom: '5%'}}>
-      <View>
-        <Text style={{fontSize: 24}}>Owner: {otherUserProfiles[index]?.name}</Text>
-        <Text style={{fontSize: 24}}>Pet: {otherUserProfiles[index]?.pet?.name}</Text>
-        <Text style={{fontSize: 24}}>Species: {otherUserProfiles[index]?.pet?.species}</Text>
+    <View style={{flex: 1, padding: '15%', alignItems: 'flex-end'}}>
+      <Button onPress={() => navigation.navigate('Preferences')}>Preferences</Button>
+      <View style={{flex: 1, justifyContent: 'space-between', alignItems: 'center', marginTop: '25%', marginBottom: '5%'}}>
+        <View>
+          <Text style={{fontSize: 24}}>Owner: {otherUserProfiles[index]?.name}</Text>
+          <Text style={{fontSize: 24}}>Pet: {otherUserProfiles[index]?.pet?.name}</Text>
+          <Text style={{fontSize: 24}}>Species: {otherUserProfiles[index]?.pet?.species}</Text>
+        </View>
+        <View>
+          {
+            otherUserProfiles[index]?.pet?.profileImage ?  
+            <Image 
+            source={ {uri: otherUserProfiles[index]?.pet?.profileImage}}
+            style={{
+              width: 300,
+              height: 300,
+            }} 
+          /> 
+          :
+          <Text>No image avalible</Text>
+          }
+        
+        </View>
+        <View style={{display: 'flex', flexDirection: 'row'}}>
+          <IconButton onPress={() =>  dislikeUser(otherUserProfiles[index].userUID)} icon={'thumb-down'} size={50} mode={'contained'} iconColor={'#ff000075'}/>
+          <IconButton onPress={() =>  likeUser(otherUserProfiles[index].userUID)} icon={'thumb-up'} size={50} mode={'contained'}/>
+        </View>
       </View>
-      <View>
-        {
-          otherUserProfiles[index]?.pet?.profileImage ?  
-          <Image 
-          source={ {uri: otherUserProfiles[index]?.pet?.profileImage}}
-          style={{
-            width: 300,
-            height: 300,
-          }} 
-        /> 
-        :
-         <Text>No image avalible</Text>
-         }
-       
-      </View>
-    <View style={{display: 'flex', flexDirection: 'row'}}>
-      <IconButton onPress={() =>  dislikeUser(otherUserProfiles[index].userUID)} icon={'thumb-down'} size={50} mode={'contained'} iconColor={'#ff000075'}/>
-      <IconButton onPress={() =>  likeUser(otherUserProfiles[index].userUID)} icon={'star'} size={50} mode={'contained'}/>
-    </View>
     </View>
   )
 }

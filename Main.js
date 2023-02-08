@@ -18,6 +18,8 @@ import MessagePage from './src/pages/messages/MessagePage';
 import {
   StatusBar,
 } from 'react-native';
+import PreferencesPage from './src/pages/home/preferences/PreferencesPage';
+import HomeStack from './src/pages/home/HomeStack';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -91,7 +93,7 @@ const Main  = () =>  {
                 ),
                 }} 
               name="Home" 
-              component={HomePage} 
+              component={HomeStack} 
             />
             <Tab.Screen  
               options={{

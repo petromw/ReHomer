@@ -18,20 +18,36 @@ export default function AdopteeHomePage() {
   const [otherUserProfiles, setOtherUserProfiles] = useState([])
   const [index, setIndex] = useState(0)
 
+  const [likedThisSession, setLikedThisSession] = useState([]) 
+  const [dislikedThisSession, setDislikedThisSession] = useState([]) 
+
+
+
 
   const getOtherUsers = async () => {
     try {
       const users = []
-      const otherUsers = await getDocs(query(collection(db, 'users'), where('type', '==', 'Adoptor')))
+      const fitleredOut = [].concat(user?.user?.likedProfiles ?? []).concat(user?.user?.dislikedProfiles ?? []) 
+       
+      const otherUsers =  fitleredOut.length > 0 ? await getDocs(query(
+        collection(db, 'users'), 
+          where('type', '==', 'Adoptor'), 
+          where('userUID', 'not-in', fitleredOut),
+          
+        )) : await getDocs(query(
+          collection(db, 'users'), 
+            where('type', '==', 'Adoptor'), 
+            
+          ))
       otherUsers.forEach((user) => {
         users.push(user.data())
       })
       return users
     } catch (error) {
+      console.error(error)
       return null
     }
   }
-
 
   useEffect(() => {
     const load = async() => {
@@ -43,16 +59,34 @@ export default function AdopteeHomePage() {
     load()
   }, [db])
 
-  
-  const likeUser = () => {
-    console.log('like', otherUserProfiles[index])
-    setIndex(index + 1)
-  }
+  const likeUser = async (uid) => {
+    try {
+      const likedProfiles =  [].concat(user?.user?.likedProfiles ?? []).concat(likedThisSession).concat(uid)
+      setLikedThisSession([...likedThisSession, uid])
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", user.uid), { likedProfiles});
+      });
+      console.log("Transaction likeUser successfully committed!");
+      setIndex(index + 1)
+    } catch (e) {
+      console.error("Transaction likeUser failed: ", e);
+    }
+  };
 
-  const disLikeUser = () => {
-    console.log('dislike', otherUserProfiles[index])
-    setIndex(index + 1)
-  }
+  const dislikeUser = async (uid) => {
+    try {
+      const dislikedProfiles =  [].concat(user?.user?.likedProfiles ?? []).concat(dislikedThisSession).concat(uid)
+      setDislikedThisSession([...dislikedThisSession, uid])
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", user.uid), {  dislikedProfiles});
+      });
+      console.log("Transaction dislikeUser successfully committed!");
+      setIndex(index + 1)
+    } catch (e) {
+      console.error("Transaction dislikeUser failed: ", e);
+    }
+  };
+
 
   if(index > otherUserProfiles.length - 1){
     return (
@@ -68,7 +102,7 @@ export default function AdopteeHomePage() {
       <Text style={{fontSize: 22, textAlign: 'center', marginTop: 25}}>Has a {otherUserProfiles[index]?.adoptorFields?.houseType}</Text>
       <Text style={{fontSize: 22, textAlign: 'center', marginTop: 25}}>with {otherUserProfiles[index]?.adoptorFields?.familyType}</Text>
       <View style={{display: 'flex', flexDirection: 'row'}}>
-        <IconButton onPress={() =>  disLikeUser(otherUserProfiles[index])} icon={'thumb-down'} size={50} mode={'contained'} iconColor={'#ff000075'}/>
+        <IconButton onPress={() =>  dislikeUser(otherUserProfiles[index])} icon={'thumb-down'} size={50} mode={'contained'} iconColor={'#ff000075'}/>
         <IconButton onPress={() =>  likeUser(otherUserProfiles[index])} icon={'star'} size={50} mode={'contained'}/>
       </View>
     </View>
