@@ -20,6 +20,9 @@ import {
 } from 'react-native';
 import PreferencesPage from './src/pages/home/preferences/PreferencesPage';
 import HomeStack from './src/pages/home/HomeStack';
+import { ActivityIndicator, Text } from 'react-native-paper';
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -65,11 +68,17 @@ const Main  = () =>  {
       }
     });
 
-     if(!loggedIn){
+    if(loading){
+      return (
+        <SafeAreaView style={{display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550'}}>
+          <ActivityIndicator animating={true}/>
+        </SafeAreaView>
+      )
+    } else if(!loggedIn){
       return (
          <NavigationContainer>
       
-              <Stack.Navigator initialRouteName="Register">
+              <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen name="Register"  options={{ headerShown: false }} >
                   {(props) => <RegisterScreen {...props}/>}
 
