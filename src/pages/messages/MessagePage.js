@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   height: 50,
   borderRadius: 25,
   },
-  })
+})
 
 
 export default function MessagePage() {

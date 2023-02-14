@@ -2,8 +2,7 @@ import React, { useState } from 'react';
   import { StyleSheet, Text, View } from 'react-native';
   import { Dropdown } from 'react-native-element-dropdown';
 
-  const DropdownComponent = (props) => {
-    const {data,  value, setValue} = props
+  const DropdownComponent = ({data,  value, setValue}) => {
     const [isFocus, setIsFocus] = useState(false);
 
     const renderLabel = () => {
@@ -19,7 +18,7 @@ import React, { useState } from 'react';
 
     return (
       <View style={styles.container}>
-        {renderLabel()}
+        {/* {renderLabel()} */}
         <Dropdown
           style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
           placeholderStyle={styles.placeholderStyle}

@@ -12,6 +12,7 @@ import CustomRadioButton from '../components/CustomRadioButton';
 import { LinearProgress } from '@rneui/themed/dist/LinearProgress';
 import CustomLinearProgress from '../components/CustomLinearProgress';
 import * as ImagePicker from 'expo-image-picker';
+import { petTypeArray } from '../utils';
 
 
 
@@ -186,10 +187,10 @@ export default function OnBoarding() {
                   onChangeText={(name) => setPetName(name)}
                 />
                 <Text>And what type of animal is your pet?</Text>
-                  <CustomRadioButton onPress={() => setPetSpecies('Cat')} title={'Cat'} checked={petSpecies === 'Cat'}/>
-                  <CustomRadioButton onPress={() => setPetSpecies('Dog')} title={'Dog'} checked={petSpecies === 'Dog'}/>
-                  <CustomRadioButton onPress={() => setPetSpecies('Bird')} title={'Bird'} checked={petSpecies === 'Bird'}/>
-  
+                  {petTypeArray.map((petType) => {return (
+                    <CustomRadioButton onPress={() => setPetSpecies(petType)} title={petType} checked={petSpecies === petType}/>    
+                  )})}
+                
                 </View>
                 }
                  {step === 3 && 
