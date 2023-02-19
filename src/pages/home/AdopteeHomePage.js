@@ -29,16 +29,36 @@ export default function AdopteeHomePage(props) {
       const users = []
       const fitleredOut = [].concat(user?.user?.likedProfiles ?? []).concat(user?.user?.dislikedProfiles ?? []) 
        
-      const otherUsers =  fitleredOut.length > 0 ? await getDocs(query(
-        collection(db, 'users'), 
-          where('type', '==', 'Adoptor'), 
-          where('userUID', 'not-in', fitleredOut),
-          
-        )) : await getDocs(query(
-          collection(db, 'users'), 
-            where('type', '==', 'Adoptor'), 
-            
-          ))
+      const queryFiltered = (likedAndDislikedUsers) => {
+        if(user.user.preferences){
+          console.log({pref: user.user.preferences})
+          if(likedAndDislikedUsers >= 1){
+            return query(
+              collection(db, 'users'), 
+              where('type', '==', 'Adoptor'), 
+              where('userUID', 'not-in', fitleredOut),
+              where('adoptorFields.familyType', '==', user.user.preferences.familyType),
+              where('adoptorFields.houseType', '==', user.user.preferences.houseType)
+
+            )
+          } else{
+            return query(
+              collection(db, 'users'), 
+              where('type', '==', 'Adoptor'),
+              where('adoptorFields.familyType', '==', user.user.preferences.familyType),
+              where('adoptorFields.houseType', '==', user.user.preferences.houseType)
+
+            )
+          }            
+        } else {
+          if(likedAndDislikedUsers >= 1){
+            return query(collection(db, 'users'), where('type', '==', 'Adoptor'), where('userUID', 'not-in', fitleredOut))
+          } else{
+            return query(collection(db, 'users'), where('type', '==', 'Adoptor'))
+          }
+        }      
+    } 
+    const otherUsers =  await getDocs(queryFiltered(fitleredOut))
       otherUsers.forEach((user) => {
         users.push(user.data())
       })
@@ -57,7 +77,7 @@ export default function AdopteeHomePage(props) {
       }
     }
     load()
-  }, [db])
+  }, [db, user])
 
   const likeUser = async (uid) => {
     try {
@@ -90,8 +110,11 @@ export default function AdopteeHomePage(props) {
 
   if(index > otherUserProfiles.length - 1){
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>No more Profiles. Please try again later</Text>        
+      <View style={{flex: 1, padding: '15%', alignItems: 'flex-end'}}>
+        <Button onPress={() => navigation.navigate('Preferences')}>Preferences</Button>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text>No more Profiles. Please try again later</Text>        
+        </View>
       </View>
     )
   }

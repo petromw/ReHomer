@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { collection, getDocs, getFirestore, query, where, runTransaction, doc} from "firebase/firestore";
 import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
+import { petTypeArray } from '../../utils';
 
 
 
@@ -29,16 +30,35 @@ export default function AdoptorHomePage(props) {
       const users = []
       const fitleredOut = [].concat(user?.user?.likedProfiles ?? []).concat(user?.user?.dislikedProfiles ?? []) 
        
-      const otherUsers =  fitleredOut.length > 0 ? await getDocs(query(
-        collection(db, 'users'), 
-          where('type', '==', 'Adoptee'), 
-          where('userUID', 'not-in', fitleredOut),
-          
-        )) : await getDocs(query(
-          collection(db, 'users'), 
-            where('type', '==', 'Adoptee'), 
-            
-          ))
+      const queryFiltered = (likedAndDislikedUsers) => {
+          if(user.user.preferences){
+            const species = user.user.preferences.petType ? [user.user.preferences.petType] : petTypeArray
+            console.log({species})
+            if(likedAndDislikedUsers >= 1){
+              return query(
+                collection(db, 'users'), 
+                where('type', '==', 'Adoptee'), 
+                where('userUID', 'not-in', fitleredOut),
+                where('pet.species', 'in', species),
+                where('pet.age', '==', user.user.preferences.petAge)
+              )
+            } else{
+              return query(
+                collection(db, 'users'), 
+                where('type', '==', 'Adoptee'),
+                where('pet.species', 'in', species),
+                where('pet.age', '==', user.user.preferences.petAge)
+              )
+            }            
+          } else {
+            if(likedAndDislikedUsers >= 1){
+              return query(collection(db, 'users'), where('type', '==', 'Adoptee'), where('userUID', 'not-in', fitleredOut))
+            } else{
+              return query(collection(db, 'users'), where('type', '==', 'Adoptee'))
+            }
+          }      
+      } 
+      const otherUsers =  await getDocs(queryFiltered(fitleredOut))
       otherUsers.forEach((user) => {
         users.push(user.data())
       })
@@ -58,7 +78,7 @@ export default function AdoptorHomePage(props) {
       }
     }
     load()
-  }, [db])
+  }, [db, user])
 
   
   const likeUser = async (uid) => {
@@ -91,8 +111,11 @@ export default function AdoptorHomePage(props) {
 
   if(index > otherUserProfiles.length - 1){
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>No more Profiles. Please try again later</Text>        
+    <View style={{flex: 1, padding: '15%', alignItems: 'flex-end'}}>
+      <Button onPress={() => navigation.navigate('Preferences')}>Preferences</Button>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text>No more Profiles. Please try again later</Text>        
+        </View>
       </View>
     )
   }

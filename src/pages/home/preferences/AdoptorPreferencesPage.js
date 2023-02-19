@@ -1,12 +1,9 @@
-import { View , Text} from 'react-native'
-import React from 'react'
+import { View , Text, SafeAreaView} from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { styles } from './PreferencesPage'
-import { SafeAreaView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import DropdownComponent from '../../../components/DropDownSelect'
-import { useState } from 'react'
 import { petTypeArray , petSizeArray,petAgeArray} from '../../../utils'
-import { useEffect } from 'react'
 import { setUser } from '../../../redux/userSlice'
 import {  doc, runTransaction, getFirestore } from 'firebase/firestore';
 import { Slider } from '@rneui/base'
@@ -28,11 +25,10 @@ export default function AdoptorPreferencesPage() {
 
   useEffect(() => {
     if(user && user.preferences){
-      console.log({user})
-      setSelectedPetType(user.preferences.petType)
-      setSelectedPetSize(user.preferences.petSize)
-      setSelectedPetAge(user.preferences.petAge)
-      setDistance(user.preferences.distance)
+      user.preferences.petType && setSelectedPetType(user.preferences.petType)
+      user.preferences.petSize && setSelectedPetSize(user.preferences.petSize)
+      user.preferences.petAge && setSelectedPetAge(user.preferences.petAge)
+      user.preferences.distance && setDistance(user.preferences.distance)
     } 
   }, [user])
 
