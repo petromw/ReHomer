@@ -18,6 +18,7 @@ export default function Map() {
         }}
 
       >
+        
         <Marker
           coordinate={{
             latitude: 39.1329,
@@ -33,7 +34,7 @@ export default function Map() {
                 <Text>Name of Pet: Otis</Text>
                 <Image
                   style={styles.image}
-                  source={require('../src/assets/sleepinsbed1.jpg')}
+                  image={require('../assets/sleepinsbed1.jpg')}
                 />
               </View>
               <View style={styles.arrowBorder} />
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   bubble: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignSelf: 'flex-start',
     backgroundColor: '#fff',
     borderRadius: 6,
@@ -86,8 +87,8 @@ const styles = StyleSheet.create({
     marginTop: -0.5
   },
   image: {
-    width: 120,
-    height: 80
+    width: 50,
+    height: 50
   }
 
 });
