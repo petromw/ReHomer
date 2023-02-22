@@ -79,6 +79,12 @@ export default function OnBoarding() {
     } else {
       try {
         createPet()
+        if(type !== 'Adoptee'){
+          updateUser(type)
+          await runTransaction(db, async (transaction) => {
+            transaction.update(doc(db, "users", uid), { adoptorFields: adoptorFields});
+          });
+        }
         await runTransaction(db, async (transaction) => {
           transaction.update(doc(db, "users", uid), { onboardingComplete: true });
         });
@@ -90,6 +96,38 @@ export default function OnBoarding() {
     }
     
   }
+
+  const [image, setImage] = useState(null);
+
+  const uploadImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    setImage(result.uri)
+    try {
+      const petImages = (user?.pet?.images && user?.pet?.images?.length) > 0 ? [].concat(user.pet.images).concat(result.uri) : [result.uri]
+      console.log(petImages)
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages, profileImage: petImages[0]} });
+      });
+
+      dispatch(setUser({...user, pet: {...user.pet, images: petImages}} ))
+
+      console.log("Transaction successfully committed!");
+    } catch (e) {
+      console.error("Transaction uploadImage failed: ", e);
+    }
+   
+
+
+  };
+  
+  
+
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550', padding: 25}}>
       <Text style={{position: 'absolute', right: 50, top: 50}}>{step + 1} / {totalSteps + 1} </Text>
