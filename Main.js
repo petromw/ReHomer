@@ -14,7 +14,7 @@ import OnBoarding from './src/pages/Onboarding';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Profile from './src/pages/profile/ProfilePageWrapper';
-import MessagePage from './src/pages/messages/MessagePage';
+import MessagePage from './src/pages/matches/MatchSection';
 import {
   StatusBar,
 } from 'react-native';
@@ -23,6 +23,7 @@ import HomeStack from './src/pages/home/HomeStack';
 import { ActivityIndicator, Text } from 'react-native-paper';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import MatchSectionStack from './src/pages/matches/MatchSectionStack';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -106,8 +107,9 @@ const Main  = () =>  {
                 ),
                 }} 
               name="Messages" 
-              component={MessagePage} 
+              component={MatchSectionStack} 
             />
+            
             <Tab.Screen  
               options={{
                 tabBarLabel: '',
