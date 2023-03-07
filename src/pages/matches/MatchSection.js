@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Divider } from 'react-native-paper';
 import { collection, getDocs, getFirestore, query, where, runTransaction, doc} from "firebase/firestore";
 import blankProfile from '../../assets/blankProfile.jpg'
+import { setChattingWith } from '../../redux/userSlice';
+
 
 const styles = StyleSheet.create({
   container: {
@@ -54,6 +56,7 @@ export default function MatchSection(props) {
   const [likedUsers, setLikedUsers] = useState([])
   const [matches, setMatches] = useState([])
   const navigation = props.navigation
+  const dispatch = useDispatch()
 
   const getOtherUsers = async () => {
     try {
@@ -104,6 +107,7 @@ export default function MatchSection(props) {
 
   const handleMatchPress = (match) => {
     navigation.navigate("ChatPage")
+    dispatch(setChattingWith(match)) 
     console.log(`Open chat with ${match.name}`)
   }
   
@@ -118,7 +122,7 @@ export default function MatchSection(props) {
           
           <ScrollView horizontal style={{maxHeight: 100}}>
           {likedUsers.map((match) => (
-              <View  style={styles.likesContainer}>
+              <View key={match.userUID} style={styles.likesContainer}>
                 <Image source={match.profileImage ? {uri: match.profileImage} : blankProfile} style={styles.profilePicture} />
                 <Text style={styles.matchName}>{match.name}</Text>
               </View>
