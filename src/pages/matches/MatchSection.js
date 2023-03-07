@@ -1,5 +1,5 @@
 
-import { View, Text , StyleSheet, TouchableOpacity, Image} from 'react-native'
+import { View, Text , StyleSheet, TouchableOpacity, Image, ScrollView} from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { getAuth } from "firebase/auth";
 import { useSelector, useDispatch } from 'react-redux'
@@ -14,9 +14,22 @@ const styles = StyleSheet.create({
   marginTop: 75,
   },
   title: {
-  fontSize: 20,
+  fontSize: 24,
   fontWeight: 'bold',
   marginBottom: 20,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 5,
+    },
+  likesContainer: {
+    marginLeft: 5,
+    marginRight: 5,
+    
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingVertical: 10,
   },
   matchContainer: {
   flexDirection: 'row',
@@ -35,26 +48,36 @@ const styles = StyleSheet.create({
   })
 
 
-export default function MessagePage() {
+export default function MatchSection(props) {
   const user = useSelector((state) => state.user)
   const db = getFirestore()
+  const [likedUsers, setLikedUsers] = useState([])
   const [matches, setMatches] = useState([])
+  const navigation = props.navigation
 
   const getOtherUsers = async () => {
     try {
-      const users = []
+      const liked = []
+      const matched = []
       const likes = [].concat(user?.user?.likedProfiles ?? [])
        
       const otherUsers =   await getDocs(query(
         collection(db, 'users'), 
-          where('type', '==', 'Adoptee'), 
           where('userUID', 'in', likes),
           
         )) 
       otherUsers.forEach((user) => {
-        users.push(user.data())
+        liked.push(user.data())
       })
-      return users
+      const matchesQuery =   await getDocs(query(
+        collection(db, 'users'), 
+          where('userUID', 'in', likes),
+          where('likedProfiles', 'array-contains', user.user.userUID)
+        )) 
+      matchesQuery.forEach((user) => {
+        matched.push(user.data())
+      })
+      return {liked, matched}
     } catch (error) {
       console.error(error)
       return null
@@ -65,14 +88,22 @@ export default function MessagePage() {
   useEffect(() => {
     const load = async() => {
       const users = await getOtherUsers()
-      if(users && users.length > 0){
-        setMatches(users)
+      if(users){
+        if(users.liked.length > 0){
+          setLikedUsers(users.liked)
+
+        }
+        if(users.matched.length > 0){
+          setMatches(users.matched)
+
+        }
       }
     }
     load()
   }, [db])
 
   const handleMatchPress = (match) => {
+    navigation.navigate("ChatPage")
     console.log(`Open chat with ${match.name}`)
   }
   
@@ -81,7 +112,25 @@ export default function MessagePage() {
       <View style={styles.container}>
         <Text style={styles.title}>Messages</Text>
         <Divider />
-        {matches.length > 0 ? 
+        <Text style={styles.subtitle}>Likes</Text>
+        
+        {likedUsers.length > 0 ? 
+          
+          <ScrollView horizontal style={{maxHeight: 100}}>
+          {likedUsers.map((match) => (
+              <View  style={styles.likesContainer}>
+                <Image source={match.profileImage ? {uri: match.profileImage} : blankProfile} style={styles.profilePicture} />
+                <Text style={styles.matchName}>{match.name}</Text>
+              </View>
+            ))} 
+            </ScrollView>
+          : 
+            <Text style={{textAlign: 'center'}}>No likes found</Text>
+          }
+          <Divider />
+        <Text style={styles.subtitle}>Matches</Text>
+        
+          {matches.length > 0 ? 
           matches.map((match) => (
             <TouchableOpacity onPress={() => handleMatchPress(match)} key={match.userUID}>
               <View style={styles.matchContainer}>

@@ -12,6 +12,7 @@ import CustomRadioButton from '../components/CustomRadioButton';
 import { LinearProgress } from '@rneui/themed/dist/LinearProgress';
 import CustomLinearProgress from '../components/CustomLinearProgress';
 import * as ImagePicker from 'expo-image-picker';
+import { houseTypeArray, petTypeArray } from '../utils';
 
 
 
@@ -114,7 +115,6 @@ export default function OnBoarding() {
     setImage(result.uri)
     try {
       const petImages = (user?.pet?.images && user?.pet?.images?.length) > 0 ? [].concat(user.pet.images).concat(result.uri) : [result.uri]
-      console.log(petImages)
       await runTransaction(db, async (transaction) => {
         transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages, profileImage: petImages[0]} });
       });
@@ -186,10 +186,10 @@ export default function OnBoarding() {
                   onChangeText={(name) => setPetName(name)}
                 />
                 <Text>And what type of animal is your pet?</Text>
-                  <CustomRadioButton onPress={() => setPetSpecies('Cat')} title={'Cat'} checked={petSpecies === 'Cat'}/>
-                  <CustomRadioButton onPress={() => setPetSpecies('Dog')} title={'Dog'} checked={petSpecies === 'Dog'}/>
-                  <CustomRadioButton onPress={() => setPetSpecies('Bird')} title={'Bird'} checked={petSpecies === 'Bird'}/>
-  
+                  {petTypeArray.map((petType) => {return (
+                    <CustomRadioButton onPress={() => setPetSpecies(petType)} title={petType} checked={petSpecies === petType}/>    
+                  )})}
+                
                 </View>
                 }
                  {step === 3 && 
@@ -215,19 +215,20 @@ export default function OnBoarding() {
               {step === 2 && 
               <View style={{justifyContent: 'center', marginTop: 25}}>
                 <Text>What kind of house do you live in?</Text>
-                  <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, houseType: 'House with a big yard and fence'})} title={'House with a big yard and fence'} checked={adoptorFields.houseType === 'House with a big yard and fence'}/>
-                  <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, houseType:'House with a big yard and no fence'})} title={'House with a big yard and no fence'} checked={adoptorFields.houseType === 'House with a big yard and no fence'}/>
-                  <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, houseType:'House with a small yard or no yard'})} title={'House with a small yard or no yard'} checked={adoptorFields.houseType === 'House with a small yard or no yard'}/>
-                  <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, houseType: 'Apartment'})} title={'Apartment'} checked={adoptorFields.houseType === 'Apartment'}/>
-  
+                {houseTypeArray.map((houseType) => {return (
+                    <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, houseType})} title={houseType} checked={adoptorFields.houseType === houseType}/>
+                )})}
                 </View>
                 }
                 {step === 3 && 
               <View style={{justifyContent: 'center', marginTop: 25}}>
                 <Text>What people will live with the pet?</Text>
-                  <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, familyType: 'Only adults'})} title={'Only adults'} checked={adoptorFields.familyType === 'Only adults'}/>
-                  <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, familyType: 'Adults and older children'})} title={'Adults and older children'} checked={adoptorFields.familyType === 'Adults and older children'}/>
-                  <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, familyType: 'Some small children'})} title={'Some small children'} checked={adoptorFields.familyType === 'Some small children'}/>
+                  {
+                    familyTypeArray.map((familyType) => {return (
+                      <CustomRadioButton onPress={() => setAdoptorFields({...adoptorFields, familyType})} title={familyType} checked={adoptorFields.familyType === familyType}/>
+
+                    )})
+                  }
                 </View>
                 }
               </>
