@@ -108,7 +108,6 @@ export default function MatchSection(props) {
   const handleMatchPress = (match) => {
     navigation.navigate("ChatPage")
     dispatch(setChattingWith(match)) 
-    console.log(`Open chat with ${match.name}`)
   }
   
   return (

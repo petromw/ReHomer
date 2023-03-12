@@ -12,25 +12,180 @@ import {
   ScrollView
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux'
+import { collection, getDocs, getFirestore, query, where, runTransaction, doc, firebase, addDoc} from "firebase/firestore";
 
-const exampleMessages = [
-  { text: "Hey, how's it going?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "Not too bad, just hanging out. How about you?", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1' },
-  { text: "Same here, just chilling at home. Did you do anything fun this weekend?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "Yeah, I went to the beach with some friends. It was really nice.", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1' },
-  { text: "That sounds awesome. I haven't been to the beach in ages. Maybe we should plan a trip sometime?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "Definitely! That would be so much fun.", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1' },
-  { text: "Have you been to any other cool places lately?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "Yeah, I went hiking in the mountains last week. The views were amazing.", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1' },
-  { text: "Wow, that sounds incredible. I love hiking but I haven't been in ages. Where did you go?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "We went to the national park about an hour from here. It's really beautiful this time of year.", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1' },
-  { text: "I'll have to check that out sometime. Maybe we could go together next time?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "That would be great! Let me know when you're free and we can plan something.", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1' },
-  { text: "Definitely. How's next weekend for you?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "Next weekend works for me. Let's do it!", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1' },
-  { text: "Awesome, I can't wait. Hey, have you seen that new movie that just came out?", sentBy: 'A787YQ8fggYapINQhvwyYrPxzLp2' },
-  { text: "No, I haven't had a chance to see it yet. What's it called?", sentBy: 'IjNP5JqABeRGcG5uOjYiPfsrXNt1'}
-]
+
+
+const ChatPage = () => {
+  const user = useSelector((state) => state.user)
+  const chattingWith = useSelector((state) => (state.user.chattingWith))
+
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [newMessageText, setNewMessageText] = useState('')
+  const db = getFirestore()
+  const [messages, setMessages] = useState([])
+  const [messageGroup, setMessageGroup] = useState({})
+
+  useEffect(() => {
+    console.log(messageGroup)
+  }, [messageGroup])
+
+ useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  const getMessages = async () => {
+    const messageArray = []
+    try {
+    const fetchedMessages = await getDocs(query(
+      collection(db, 'messageGroups'), 
+        where('users', 'array-contains', user.user.userUID),       
+      )) 
+      fetchedMessages.forEach((group) => {
+        if(group.data().users.includes(chattingWith.userUID)){
+          if(group.id){
+            setMessageGroup(group)
+          }
+          group.data().messages.forEach((mesg) => {
+            messageArray.push(mesg)
+          })
+        } 
+      })
+      return messageArray
+    } catch (error) {
+      console.error(error)
+      return null
+    }
+  }
+
+  const createNewMessageGroup = async () => {
+    try { 
+     
+      const messageGroupsRef = await addDoc(collection(db, "messageGroups"), {
+        messages: [],
+        users: [user.user.userUID, chattingWith.userUID]
+      });
+      setMessageGroup(messageGroupsRef)
+      
+      console.log("Transaction create new message group successfully committed!");
+    } catch (e) {
+      console.error("Transaction create new message failed: ", e);
+    } 
+  }
+
+  useEffect(() => {
+    console.log('Getting Messages')
+    const load = async() => {
+      const messageArray = await getMessages()
+      if(!messageGroup.id && messageArray.length <= 0){
+        await createNewMessageGroup()
+      }
+      const sorted = messageArray.sort((a, b) => a.sentAt - b.sentAt)
+      setMessages(sorted ?? [])
+    }
+    if(user.user.userUID && chattingWith && db){
+      load()
+    }
+  }, [user, chattingWith, db])
+  
+
+
+  const sendMessage = async () => {
+    setNewMessageText('')
+    try {
+      const newMessages =  (messages ?? []).concat([{message: newMessageText, sentBy: user.user.userUID, sentAt: new Date()}])
+      
+      setMessages(newMessages)
+        await runTransaction(db, async (transaction) => {
+          transaction.update(doc(db, "messageGroups", messageGroup.id), { messages: newMessages});
+        });
+        
+      
+      
+      
+    } catch (e) {
+      console.error("Transaction send message failed: ", e);
+    }
+  };
+
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+      {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+        <View style={styles.inner}>
+        <ScrollView > 
+          {messages && messages.length > 0 && messages.map((message, index) => {
+            const isThisUsersMessage = message.sentBy === user.user.userUID
+            if(isThisUsersMessage){return (
+              <View style={{
+                backgroundColor: "#0078fe",
+                padding:10,
+                marginLeft: '45%',
+                borderRadius: 5,
+                marginTop: 5,
+                marginRight: "5%",
+                maxWidth: '50%',
+                alignSelf: 'flex-end',
+                borderRadius: 20,
+                marginBottom: index === messages.length -1  ? 15 : 0
+              }} key={index}>                
+                <Text style={{ fontSize: 16, color: "#fff", }} key={index}>{message.message}</Text>
+                <View style={styles.rightArrow}/>
+                <View style={styles.rightArrowOverlap}/>
+            </View>
+            )} else {
+              return (<View style={{
+                backgroundColor: "#dedede",
+                padding:10,
+                borderRadius: 5,
+                marginTop: 5,
+                marginLeft: "5%",
+                maxWidth: '50%',
+                alignSelf: 'flex-start',
+                borderRadius: 20,
+                marginBottom: index === messages.length -1  ? 15 : 0
+
+              }} key={index}>
+                  <Text style={{ fontSize: 16, color: "#000",justifyContent:"center" }} key={index}> {message.message}</Text>
+                  <View style={styles.leftArrow}/>
+                  <View style={styles.leftArrowOverlap}/>                
+                </View>
+              )
+            }
+          })}
+        </ScrollView>
+        <View style={{display: 'flex', flexDirection: 'row'}}>
+          <View style={{display: 'flex', flex: 3}}> 
+            <TextInput placeholder="New Message" value={newMessageText} onSubmitEditing={() => sendMessage()}  onChangeText={setNewMessageText}  style={[styles.textInput, {marginBottom: isKeyboardVisible ? 90 : 0}]}/>
+          </View>
+          <Button onPress={() => sendMessage()} color={'#0078fe'} variant={'contained'} title='Send'/>
+        </View>
+        </View>
+      {/* </TouchableWithoutFeedback> */}
+    </KeyboardAvoidingView>
+  );
+};
+
+export default ChatPage;
 
 
 
@@ -51,6 +206,7 @@ const styles =  StyleSheet.create({
     height: 40,
     borderColor: '#909090',
     borderWidth: 1,
+    borderRadius: 5
   },
   btnContainer: {
     backgroundColor: 'white',
@@ -103,85 +259,3 @@ const styles =  StyleSheet.create({
   
   },
 });
-
-const ChatPage = () => {
-  const user = useSelector((state) => state.user)
-
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
- useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true); // or some other action
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false); // or some other action
-      }
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-  console.log(user.user.userUID)
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
-      {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-        <View style={styles.inner}>
-        <ScrollView > 
-          {exampleMessages.map((message, index) => {
-            const isThisUsersMessage = message.sentBy === user.user.userUID
-            if(isThisUsersMessage){return (
-              <View style={{
-                backgroundColor: "#0078fe",
-                padding:10,
-                marginLeft: '45%',
-                borderRadius: 5,
-                marginTop: 5,
-                marginRight: "5%",
-                maxWidth: '50%',
-                alignSelf: 'flex-end',
-                borderRadius: 20,
-                marginBottom: index === exampleMessages.length -1  ? 15 : 0
-              }} key={index}>                
-                <Text style={{ fontSize: 16, color: "#fff", }} key={index}>{message.text}</Text>
-                <View style={styles.rightArrow}/>
-                <View style={styles.rightArrowOverlap}/>
-            </View>
-            )} else {
-              return (<View style={{
-                backgroundColor: "#dedede",
-                padding:10,
-                borderRadius: 5,
-                marginTop: 5,
-                marginLeft: "5%",
-                maxWidth: '50%',
-                alignSelf: 'flex-start',
-                borderRadius: 20,
-                marginBottom: index === exampleMessages.length -1  ? 15 : 0
-
-              }} key={index}>
-                  <Text style={{ fontSize: 16, color: "#000",justifyContent:"center" }} key={index}> {message.text}</Text>
-                  <View style={styles.leftArrow}/>
-                  <View style={styles.leftArrowOverlap}/>                
-                </View>
-              )
-            }
-          })}
-        </ScrollView>
-          <TextInput placeholder="New Message" style={[styles.textInput, {marginBottom: isKeyboardVisible ? 90 : 0}]} />
-          
-        </View>
-      {/* </TouchableWithoutFeedback> */}
-    </KeyboardAvoidingView>
-  );
-};
-
-export default ChatPage;
