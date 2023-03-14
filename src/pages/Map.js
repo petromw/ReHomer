@@ -1,9 +1,55 @@
-import React from 'react';
 import MapView, { Callout, Circle, Marker } from "react-native-maps"
 import { StyleSheet, View, Text, Image } from 'react-native';
+import { getAuth} from "firebase/auth";
+import { get, collection, getDocs, getFirestore, query, where, runTransaction, doc} from "firebase/firestore";
+import React, {useEffect, useState} from 'react'
 
 
 export default function Map() {
+  const db = getFirestore()
+  var myloop = [];
+  const [allPins, setAllPins] = useState([])
+
+
+  const getLatLong = async () => {
+    try {
+      const pins = []
+      const otherUsers = await getDocs(query(collection(db, 'pins')))
+      otherUsers.forEach((pin) => {
+        pins.push(pin.data())
+      })
+      return pins
+    } catch (error) {
+      return null
+    }
+  }
+
+
+  useEffect(() => {
+    const load = async() => {
+      const users = await getLatLong()
+      if(users && users.length > 0){
+        setAllPins(users)
+      }
+    }
+    load()
+  }, [db])
+
+  if (allPins?.length > 0 ){
+    console.log(allPins[0].lat)
+    console.log(allPins[0].long)
+
+
+    for (let i = 0; i < allPins?.length; i++) {
+      myloop.push(
+
+      );
+    }
+  }
+
+
+
+
 
 
   return (
@@ -15,14 +61,13 @@ export default function Map() {
           longitude: -84.5150,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
-        }}
-
-      >
+        }}>
         
-        <Marker
+        
+          <Marker
           coordinate={{
-            latitude: 39.1329,
-            longitude: -84.5150,
+            latitude: parseFloat(39.1329),
+            longitude: parseFloat(-84.5150),
           }}
           title="test title"
           description="test desc"
@@ -42,6 +87,11 @@ export default function Map() {
             </View>
           </Callout>
         </Marker>
+
+
+
+
+
       </MapView>
     </View>
 
