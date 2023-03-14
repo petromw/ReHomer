@@ -33,7 +33,6 @@ export default function AdoptorHomePage(props) {
       const queryFiltered = (likedAndDislikedUsers) => {
           if(user.user.preferences){
             const species = user.user.preferences.petType ? [user.user.preferences.petType] : petTypeArray
-            console.log({species})
             if(likedAndDislikedUsers >= 1){
               return query(
                 collection(db, 'users'), 
