@@ -15,10 +15,16 @@ import OnBoarding from './src/pages/Onboarding';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Profile from './src/pages/profile/ProfilePageWrapper';
-import MessagePage from './src/pages/messages/MessagePage';
+import MessagePage from './src/pages/matches/MatchSection';
 import {
   StatusBar,
 } from 'react-native';
+import PreferencesPage from './src/pages/home/preferences/PreferencesPage';
+import HomeStack from './src/pages/home/HomeStack';
+import { ActivityIndicator, Text } from 'react-native-paper';
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import MatchSectionStack from './src/pages/matches/MatchSectionStack';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -31,12 +37,7 @@ const Main  = () =>  {
     const dispatch = useDispatch()
     const db = getFirestore()
 
-    useEffect(() => {
-      console.log({liked: selectUser.likedProfiles})
-    }, [selectUser])
-
     const auth = getAuth();
-    // auth.signOut()
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         dispatch(setLoggedIn(true))
@@ -49,7 +50,6 @@ const Main  = () =>  {
 
                 dispatch(setUid(doc.id))
                 dispatch(setUser(doc.data()))
-                console.log(doc.data().likedProfiles)
               }
             }
           })
@@ -64,11 +64,17 @@ const Main  = () =>  {
       }
     });
 
-     if(!loggedIn){
+    if(loading){
+      return (
+        <SafeAreaView style={{display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550'}}>
+          <ActivityIndicator animating={true}/>
+        </SafeAreaView>
+      )
+    } else if(!loggedIn){
       return (
          <NavigationContainer>
       
-              <Stack.Navigator initialRouteName="Register">
+              <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen name="Register"  options={{ headerShown: false }} >
                   {(props) => <RegisterScreen {...props}/>}
 
@@ -92,7 +98,7 @@ const Main  = () =>  {
                 ),
                 }} 
               name="Home" 
-              component={HomePage} 
+              component={HomeStack} 
             />
             <Tab.Screen  
               options={{
@@ -102,8 +108,9 @@ const Main  = () =>  {
                 ),
                 }} 
               name="Messages" 
-              component={MessagePage} 
+              component={MatchSectionStack} 
             />
+            
             <Tab.Screen  
               options={{
                 tabBarLabel: '',

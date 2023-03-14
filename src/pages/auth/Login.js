@@ -18,7 +18,7 @@ const Login = (props) =>  {
           const errorCode = error.code;
           const errorMessage = error.message;
           setError(`${errorCode}: ${errorMessage}`)
-          console.log(error)
+          console.log(error.code)
         }   
     }
 

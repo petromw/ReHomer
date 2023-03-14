@@ -6,6 +6,7 @@ export const userSlice = createSlice({
     user: {},
     uid: '',
     loggedIn: false,
+    chattingWith: {}
   },
   reducers: {
     setUser: (state, action) => {
@@ -19,11 +20,14 @@ export const userSlice = createSlice({
     },
     completeOnboardingReduxAction: (state, action) => {
       state.user.onboardingComplete = action.payload
+    },
+    setChattingWith: (state, action) => {
+      state.chattingWith = action.payload
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setUser , setLoggedIn, setUid, completeOnboardingReduxAction} = userSlice.actions
+export const { setUser , setLoggedIn, setUid, completeOnboardingReduxAction, setChattingWith} = userSlice.actions
 
 export default userSlice.reducer
