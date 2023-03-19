@@ -85,27 +85,16 @@ export default function AdoptorProfile() {
 
             />
           </View>
+          <Text style = {styles.floating}>Set Max Distance Preference</Text>
 
-          <View style={{marginTop: '95%', width: '75%', alignSelf: 'center'}}>
+
+          <View style={{marginTop: '80%', width: '75%', alignSelf: 'center'}}>
               <Button mode='contained' onPress={() => auth.signOut()}>
                 Sign Out
               </Button>
             </View>
 
-          <Text style = {styles.floating}>Set Max Distance Preference</Text>
-          <Slider
-            style={styles.slider}
-            min={0}
-            max={100}
-            step={1}
-            floatingLabel
-            renderThumb={renderThumb}
-            renderRail={renderRail}
-            renderRailSelected={renderRailSelected}
-            renderLabel={renderLabel}
-            renderNotch={renderNotch}
-            onValueChanged={handleValueChange}
-          />
+
 
           
             
@@ -118,6 +107,10 @@ const styles = StyleSheet.create({
   header:{
     backgroundColor: '#4d4365',
     height:200,
+  },
+  slider: {
+    width: 600,
+    alignSelf: 'center',
   },
   avatar: {
     width: 130,
