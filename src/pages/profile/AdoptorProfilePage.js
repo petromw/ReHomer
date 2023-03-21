@@ -1,4 +1,4 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, updateProfile, onAuthStateChanged } from 'firebase/auth';
 import React, { useEffect,useState,useCallback,Component } from 'react';
 import {
   StyleSheet,
@@ -9,42 +9,34 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg';
-import { getDocs, getDoc, db, doc} from "firebase/firestore";
-import {useAsyncEffect} from '@react-hook/async';
-import { Slider } from '@rneui/base';
+import { firebase, getDocs, getDoc, getFirestore, runTransaction, db, doc, updateDoc} from "firebase/firestore";
 
 
 export default function AdoptorProfile() {
-  const user = useSelector((state) => state.user.user)
+  const user = useSelector((state) => state.user.user); 
+  const uid = useSelector((state) => state.user.uid)
   const profileImage = user?.profileImage ? {uri: user?.profileImage} : blankProfile
-  const familyType = user?.adoptorFields.familyType ? {uri: user?.familyType} : adoptorFields.familyType
-  const houseType = user?.adoptorFields.houseType ? {uri: user?.houseType} : adoptorFields.houseType
-  const [adoptorFields, setAdoptorFields] = useState({houseType: '', familyType: ''})
-  const [text, setText] = useState('');
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+//  const [zip, setZip] = useState('');
   const auth = getAuth();
+  const dispatch = useDispatch();
+  const db = getFirestore();
 
-  const renderThumb = useCallback(() => <Thumb/>, []);
-  const renderRail = useCallback(() => <Rail/>, []);
-  const renderRailSelected = useCallback(() => <RailSelected/>, []);
-  const renderLabel = useCallback(value => <Label text={value}/>, []);
-  const renderNotch = useCallback(() => <Notch/>, []);
-  const handleValueChange = useCallback((low, high) => {
-    setLow(low);
-    setHigh(high);
-  }, []);
+const updateUserName = async (name) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      transaction.update(doc(db, "users", uid), { name: name });
+    });
+    dispatch(setName( { ...user, name: name }))
 
-//----
-//  useEffect(() => {
-//    onAuthStateChanged(auth, async (user) => {
-//      if (user) {
-//        const snapshot = await getDoc(doc(db, 'users', user.uid))
-//        console.log(snapshot.data())
-//      }
-//    });
-//  }, []);
-//----
+    console.log("Transaction successfully committed!");
+  } catch (e) {
+    console.error("Transaction failed: ", e);
+  }
+}
 
   return (
     <View style={styles.container}>
@@ -63,29 +55,22 @@ export default function AdoptorProfile() {
           </View>
 
           <View styles={{ marginTop: '20%', marginLeft: '5%'}}>
-            <Text style = {styles.floating}>Family Type</Text>
+            <Text style = {styles.floating}>Name</Text>
             <TextInput
               style={styles.input}
-              value={user?.adoptorFields.familyType}
-              onChangeText={(text) => setAdoptorFields({...familyType, familyType: text})}
+              value={user?.name}
+              onChangeText={(name) => setName(name)}
+              onBlur={() => updateUserName(name)}
             />            
-            <Text style = {styles.floating}>House Type</Text>
+            <Text style = {styles.floating}>Email</Text>
             <TextInput
               style={styles.input}
-              value={user?.adoptorFields.houseType}
-              onChangeText={(text) => setAdoptorFields({...houseType, houseType: text})}
+              value={user?.email}
+              onChangeText={(email) => setEmail(email)}
+              onBlur={() => updateUserEmail(email)}
             />
             
-            <Text style = {styles.floating}>Zip Code</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter Zip Code"
-              onChangeText={newText => setText(newText)}
-              defaultValue={text}
-
-            />
           </View>
-          <Text style = {styles.floating}>Set Max Distance Preference</Text>
 
 
           <View style={{marginTop: '80%', width: '75%', alignSelf: 'center'}}>
@@ -100,8 +85,10 @@ export default function AdoptorProfile() {
             
        
       </View>
-  )
-}
+    )
+  }
+
+
 
 const styles = StyleSheet.create({
   header:{
@@ -194,3 +181,4 @@ const styles = StyleSheet.create({
     backgroundColor: "#4d436550",
   },
 });
+
