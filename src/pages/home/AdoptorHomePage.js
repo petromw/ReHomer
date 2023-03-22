@@ -5,7 +5,7 @@ import { collection, getDocs, getFirestore, query, where, runTransaction, doc} f
 import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
 import { petTypeArray } from '../../utils';
-
+import {getDistance, getPreciseDistance} from 'geolib';
 
 
 
@@ -29,7 +29,6 @@ export default function AdoptorHomePage(props) {
     try {
       const users = []
       const fitleredOut = [].concat(user?.user?.likedProfiles ?? []).concat(user?.user?.dislikedProfiles ?? []) 
-       
       const queryFiltered = (likedAndDislikedUsers) => {
           if(user.user.preferences){
             const species = user.user.preferences.petType ? [user.user.preferences.petType] : petTypeArray
@@ -39,14 +38,22 @@ export default function AdoptorHomePage(props) {
                 where('type', '==', 'Adoptee'), 
                 where('userUID', 'not-in', fitleredOut),
                 where('pet.species', 'in', species),
-                where('pet.age', '==', user.user.preferences.petAge)
-              )
+                where('pet.age', '==', user.user.preferences.petAge),
+                where(getPreciseDistance(
+                  { latitude: 'lat', longitude: 'long' },
+                  { latitude: user.user.preferences.lat, longitude: user.user.preferences.long }
+                ) <= user.user.preferences.distance))
+              
             } else{
               return query(
                 collection(db, 'users'), 
                 where('type', '==', 'Adoptee'),
                 where('pet.species', 'in', species),
-                where('pet.age', '==', user.user.preferences.petAge)
+                where('pet.age', '==', user.user.preferences.petAge),
+                where(getPreciseDistance(
+                  { latitude: 'lat', longitude: 'long' },
+                  { latitude: user.user.preferences.lat, longitude: user.user.preferences.long }
+                ) <= user.user.preferences.distance)
               )
             }            
           } else {
@@ -67,17 +74,22 @@ export default function AdoptorHomePage(props) {
       return null
     }
   }
+  console.log(user?.user.lat)
 
-
+  
   useEffect(() => {
     const load = async() => {
       const users = await getOtherUsers()
       if(users && users.length > 0){
+        
         setOtherUserProfiles(users)
       }
     }
+
     load()
   }, [db, user])
+    
+  
 
   
   const likeUser = async (uid) => {
@@ -107,7 +119,6 @@ export default function AdoptorHomePage(props) {
       console.error("Transaction dislikeUser failed: ", e);
     }
   };
-
   if(index > otherUserProfiles.length - 1){
     return (
     <View style={{flex: 1, padding: '15%', alignItems: 'flex-end'}}>
