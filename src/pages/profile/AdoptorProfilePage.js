@@ -14,6 +14,7 @@ import blankProfile from '../../assets/blankProfile.jpg';
 import { firebase, getDocs, getDoc, getFirestore, runTransaction, db, doc, updateDoc} from "firebase/firestore";
 
 
+
 export default function AdoptorProfile() {
   const user = useSelector((state) => state.user.user); 
   const uid = useSelector((state) => state.user.uid)
@@ -31,6 +32,19 @@ const updateUserName = async (name) => {
       transaction.update(doc(db, "users", uid), { name: name });
     });
     dispatch(setName( { ...user, name: name }))
+
+    console.log("Transaction successfully committed!");
+  } catch (e) {
+    console.error("Transaction failed: ", e);
+  }
+}
+
+const updateUserEmail = async (email) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      transaction.update(doc(db, "users", uid), { email: email });
+    });
+    dispatch(setEmail( { ...user, email: email }))
 
     console.log("Transaction successfully committed!");
   } catch (e) {
