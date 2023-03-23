@@ -12,7 +12,7 @@ import CustomRadioButton from '../components/CustomRadioButton';
 import { LinearProgress } from '@rneui/themed/dist/LinearProgress';
 import CustomLinearProgress from '../components/CustomLinearProgress';
 import * as ImagePicker from 'expo-image-picker';
-import { houseTypeArray, petTypeArray } from '../utils';
+import { familyTypeArray, houseTypeArray, petTypeArray } from '../utils';
 
 
 
