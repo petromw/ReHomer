@@ -6,8 +6,9 @@ import { Input , Button} from '@rneui/themed';
 import {useDispatch} from 'react-redux'
 import { setUid } from '../../redux/userSlice';
 import { Card } from '@rneui/base';
-
-
+import * as Location from 'expo-location';
+Location.requestForegroundPermissionsAsync();
+    
 export default function Register(props) {
     const db = getFirestore()
     const [email, setEmail] = useState('');
@@ -16,19 +17,24 @@ export default function Register(props) {
     const [error, setError] = useState('')
     const dispatch = useDispatch()
     const navigation = props.navigation
-
+    const [location, setLocation] = useState('');
     const auth = getAuth();
+
     const register = async () => {
 
       try {
         const newUser = await createUserWithEmailAndPassword(auth, email, password)
           try {
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
             const docRef = await addDoc(collection(db, "users"), {
               name,
               email, 
               userUID: newUser.user.uid,
               onboardingComplete: false,
-              type: ''
+              type: '',
+              lat: location.coords.latitude,
+              long: location.coords.longitude
             });
             dispatch(setUid(docRef.id))
             console.log("Document written with ID: ", docRef.id);

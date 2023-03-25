@@ -41,7 +41,7 @@ export default function AdoptorHomePage(props) {
                 where('pet.age', '==', user.user.preferences.petAge),
                 where(getPreciseDistance(
                   { latitude: 'lat', longitude: 'long' },
-                  { latitude: user.user.preferences.lat, longitude: user.user.preferences.long }
+                  { latitude: user.user.lat, longitude: user.user.long }
                 ) <= user.user.preferences.distance))
               
             } else{
@@ -52,7 +52,7 @@ export default function AdoptorHomePage(props) {
                 where('pet.age', '==', user.user.preferences.petAge),
                 where(getPreciseDistance(
                   { latitude: 'lat', longitude: 'long' },
-                  { latitude: user.user.preferences.lat, longitude: user.user.preferences.long }
+                  { latitude: user.user.lat, longitude: user.user.long }
                 ) <= user.user.preferences.distance)
               )
             }            
