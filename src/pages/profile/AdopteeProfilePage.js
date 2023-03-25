@@ -11,7 +11,7 @@ import { Button, IconButton } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg'
 import { Input } from '@rneui/themed';
-
+import EditProfile from './editProfile';
 
 
 
