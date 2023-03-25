@@ -26,7 +26,7 @@ export default function AdopteeProfile() {
 
 
   const uid =  useSelector((state) => state.user.uid)
-  const profileImage = user?.pet?.profileImage ? {uri: user?.pet?.profileImage} : blankProfile
+  const profileImage = user?.profilePicture ? {uri: user?.profilePicture} : blankProfile
 
   const [name, setName] = useState('')
   const [petName, setPetName] = useState('')
@@ -96,6 +96,27 @@ export default function AdopteeProfile() {
     }
   };
 
+  const uploadProfileImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    try {
+      
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", uid), { ...user,profilePicture: result.uri });
+      });
+
+      dispatch(setUser({...user, profilePicture: result } ))
+
+      console.log("Transaction successfully committed!");
+    } catch (e) {
+      console.error("Transaction uploadImage failed: ", e);
+    }
+  }
+
   return (
     <KeyboardAvoidingView
        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -105,7 +126,9 @@ export default function AdopteeProfile() {
 
       <View style={styles.container}>
         <View style={styles.header}/>
-          <Image style={styles.avatar} source={profileImage} />
+          <TouchableOpacity onPress={() => uploadProfileImage()}>
+            <Image onPress={() => uploadProfileImage()} style={styles.avatar} source={profileImage} />          
+          </TouchableOpacity>
           <View style={styles.bodyContent}>
           
           <CustomTextInput updateValue={() => updateUser({ name: name })} value={name} setValue={setName}/>
@@ -151,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom:10,
     alignSelf:'center',
     position: 'absolute',
-    marginTop:130
+    top: -75
   },
   name:{
     fontSize:500,

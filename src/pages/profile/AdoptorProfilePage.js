@@ -1,5 +1,5 @@
 import { getAuth } from 'firebase/auth';
-import React, { Component } from 'react';
+import React, { Component , useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,17 +8,43 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg'
+import CustomTextInput from '../../components/CustomTextInput';
+import { runTransaction ,getFirestore, doc} from 'firebase/firestore';
+import { setUser } from '../../redux/userSlice';
+
+
 
 
 
 export default function AdoptorProfile() {
   const user = useSelector((state) => state.user.user)
   const profileImage = user?.profileImage ? {uri: user?.profileImage} : blankProfile
+  const uid =  useSelector((state) => state.user.uid)
+
+  const db = getFirestore()
+  const dispatch = useDispatch()
+
+  const [name, setName] = useState('')
+
+  useEffect(() => {
+    setName(user?.name)
+    
+  }, [])
 
   const auth = getAuth();
-
+  const updateUser = async (field) => {
+    try {
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", uid), field);
+      });
+      dispatch(setUser({...user, field}))
+      console.log("Transaction successfully committed!");
+    } catch (e) {
+      console.error("Transaction update user failed: ", e);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -30,8 +56,8 @@ export default function AdoptorProfile() {
           </View>
           <Image style={styles.avatar} source={profileImage} />
           <View style={styles.bodyContent}>
-            <Text style={styles.name}>{user?.name}</Text>
-            
+          <CustomTextInput updateValue={() => updateUser({ name: name })} value={name} setValue={setName}/>
+          
             
           </View>
 
