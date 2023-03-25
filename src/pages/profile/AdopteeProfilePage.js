@@ -75,10 +75,13 @@ export default function AdopteeProfile() {
           </View>
 
           <View style={{marginTop: '85%', width: '75%', alignSelf: 'center'}}>
-              <Button mode='contained' onPress={() => auth.signOut()}>
+              <Button mode='contained' onPress={() => EditProfile()} style={styles.button}>
+                Edit Profile
+              </Button>            
+              <Button mode='contained' onPress={() => auth.signOut()} >
                 Sign Out
               </Button>
-            </View>
+          </View>
       </View>
   )
 }
@@ -135,5 +138,8 @@ const styles = StyleSheet.create({
     width:250,
     borderRadius:30,
     backgroundColor: "#4d436550",
+  },
+  button: {
+    marginVertical: 10,
   },
 });
