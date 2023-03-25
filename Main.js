@@ -24,6 +24,7 @@ import { ActivityIndicator, Text } from 'react-native-paper';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MatchSectionStack from './src/pages/matches/MatchSectionStack';
+import Report from './src/pages/Report/reportPage';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -120,7 +121,16 @@ const Main  = () =>  {
               name="Profile" 
               component={Profile} 
             />
-           
+            <Tab.Screen  
+              options={{
+                tabBarLabel: '',
+                tabBarIcon: () => (
+                  <MaterialCommunityIcons name="flag" color={'#fff'} size={26} />
+                ),
+                }} 
+              name="Report" 
+              component={Report} 
+            />           
           </Tab.Navigator>
         </NavigationContainer>
         )
