@@ -5,85 +5,132 @@ import {
   Text,
   View,
   Image,
+  KeyboardAvoidingView,
+  ScrollView,
   TouchableOpacity
 } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg'
 import { Input } from '@rneui/themed';
-
-
-
+import { runTransaction ,getFirestore, doc} from 'firebase/firestore';
+import { setUser } from '../../redux/userSlice';
+import CustomTextInput from '../../components/CustomTextInput';
+import * as ImagePicker from 'expo-image-picker';
+import CustomImagePicker from '../../components/CustomImagePicker';
 
 export default function AdopteeProfile() {
   const user = useSelector((state) => state.user.user)
-  const selectName = useSelector((state) => state.user.name)
+  const db = getFirestore()
+  const dispatch = useDispatch()
+
 
   const uid =  useSelector((state) => state.user.uid)
   const profileImage = user?.pet?.profileImage ? {uri: user?.pet?.profileImage} : blankProfile
 
   const [name, setName] = useState('')
-  const [editable, setEditable] = useState(false)
+  const [petName, setPetName] = useState('')
+  const [images, setImages] = useState([])
   const auth = getAuth();
 
   useEffect(() => {
-    setName(selectName)
+    if(images.length < 6){
+      const diff = 6 - images.length
+      for(let i = 0; i < diff; i++){
+        setImages([...images, {}])
+      }
+    }
+  }, [images])
+
+  useEffect(() => {
+    setName(user?.name)
+    setPetName(user?.pet.name)
+    const imagesToSet = user?.pet?.images.map((img) => {return {uri: img}})
+    if(imagesToSet.length < 6){
+      setImages(imagesToSet)
+    } else {
+      setImages([...imagesToSet, {}])
+
+    }
   }, [])
 
-  const updateUser = async () => {
+  const updateUser = async (field) => {
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { name: name });
+        transaction.update(doc(db, "users", uid), field);
       });
-      dispatch(setUser({...user, type: type}))
+      dispatch(setUser({...user, field}))
       console.log("Transaction successfully committed!");
     } catch (e) {
-      console.error("Transaction failed: ", e);
+      console.error("Transaction update user failed: ", e);
     }
   }
 
+  const uploadImage = async (index) => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    setImages([{uri: result.uri}, ...images ])
+    try {
+      const petImages = (user?.pet?.images && user?.pet?.images?.length) > 0 ? [].concat(user.pet.images).concat(result.uri) : [result.uri]
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages} });
+      });
+
+      dispatch(setUser({...user, pet: {...user.pet, images: petImages}} ))
+
+      console.log("Transaction successfully committed!");
+    } catch (e) {
+      console.error("Transaction uploadImage failed: ", e);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-          <View style={styles.header}>
-            {/* <View style={{ marginTop: '15%', alignSelf: 'flex-end', marginRight: '5%'}}>
-              <IconButton size={50} mode={'contained'} color={'#000000'} icon={'account'}/>
-            </View> */}
-            
-          </View>
+    <KeyboardAvoidingView
+       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+      <ScrollView>
+      
+
+      <View style={styles.container}>
+        <View style={styles.header}/>
           <Image style={styles.avatar} source={profileImage} />
           <View style={styles.bodyContent}>
-            {editable ?            
-         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <Input
-                  value={name}
-                  defaultValue={name}
-                  labelStyle={{color:'#0f0d14' }}
-                  placeholderTextColor={'#0f0d14'}
-                  selectionColor={'#0f0d14'}
-                  underlineColorAndroid={'#0f0d14'}
-                  onChangeText={(name) => setName(name)}
-                  onBlur={() => updateUser()}
-                />
-                <IconButton onPress={() => setEditable(!editable)}  size={15} mode={'outlined'} color={'#000000'} icon={'edit'}/>
-                </View>
-          : 
-          <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={styles.name}>{user?.name}</Text>
-            <IconButton onPress={() => setEditable(!editable)}  size={20}  color={'#000000'} icon={'pencil'}/>
+          
+          <CustomTextInput updateValue={() => updateUser({ name: name })} value={name} setValue={setName}/>
           </View>
-          }
+          <View style={styles.mainBody}>
+            <Text style={[styles.name, {textDecorationLine: 'underline'}]}>Pet</Text>
+          <CustomTextInput updateValue={() => updateUser({pet: {...user.pet, name: petName}})} value={petName} setValue={setPetName}/>
+          <View style={styles.imagesContainer}>
+            {images.map((image, index) => {
+              return (
+                <CustomImagePicker index={index} photo={image} uploadImage={uploadImage}/>
+              )
+            })}
           </View>
-
-          <View style={{marginTop: '85%', width: '75%', alignSelf: 'center'}}>
+          </View>
+          <View style={{marginTop: 15,  width: '75%', alignSelf: 'center'}}>
               <Button mode='contained' onPress={() => auth.signOut()}>
                 Sign Out
               </Button>
             </View>
       </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
+  imagesContainer: {  flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center'},
   header:{
     backgroundColor: '#4d4365',
     height:200,
@@ -108,6 +155,9 @@ const styles = StyleSheet.create({
     marginTop:40,
     alignItems: 'center',
     padding:30,
+  },
+  mainBody: {
+    margin: 10
   },
   name:{
     fontSize:28,
@@ -136,4 +186,14 @@ const styles = StyleSheet.create({
     borderRadius:30,
     backgroundColor: "#4d436550",
   },
+  blankPhoto: {
+    borderColor: '#afafaf', 
+    width: 100, 
+    height: 100, 
+    borderStyle: 'dashed', 
+    borderWidth: 2, 
+    borderRadius: 8, 
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 });

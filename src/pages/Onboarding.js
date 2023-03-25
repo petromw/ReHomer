@@ -125,9 +125,6 @@ export default function OnBoarding() {
     } catch (e) {
       console.error("Transaction uploadImage failed: ", e);
     }
-   
-
-
   };
   
   
