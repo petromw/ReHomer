@@ -66,17 +66,24 @@ export default function AdopteeProfile() {
     }
   }
 
-  const uploadImage = async (index) => {
-    // No permissions request is necessary for launching the image library
+  const uploadImage = async (index, existing) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-    setImages([{uri: result.uri}, ...images ])
+    const imageArrayCopy = [...images]
+    if(existing){
+      imageArrayCopy.splice(index, 1)
+    }
+    setImages([{uri: result.uri}, ...imageArrayCopy])
     try {
-      const petImages = (user?.pet?.images && user?.pet?.images?.length) > 0 ? [].concat(user.pet.images).concat(result.uri) : [result.uri]
+      const userImages = [...user?.pet?.images]
+      if(existing){
+        userImages.splice(index, 1)
+      }
+      const petImages = (userImages && userImages.length) > 0 ? [].concat(userImages).concat(result.uri) : [result.uri]
       await runTransaction(db, async (transaction) => {
         transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages} });
       });
@@ -109,7 +116,7 @@ export default function AdopteeProfile() {
           <View style={styles.imagesContainer}>
             {images.map((image, index) => {
               return (
-                <CustomImagePicker index={index} photo={image} uploadImage={uploadImage}/>
+                <CustomImagePicker key={index} index={index} photo={image} uploadImage={uploadImage}/>
               )
             })}
           </View>

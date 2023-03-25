@@ -17,7 +17,7 @@ import { Input } from '@rneui/themed';
     }
     if(editable) {
       return (
-        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginHorizontal: 15}}>
+        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginHorizontal: 15, width: '80%'}}>
            <Input
            
                  value={value}

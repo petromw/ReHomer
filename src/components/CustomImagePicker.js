@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   TouchableOpacity,
   Image
@@ -10,10 +9,11 @@ import {  IconButton } from 'react-native-paper';
 
 
   const CustomImagePicker = ({uploadImage, photo, index}) => {
+    const existing = !!photo.uri
     return (
       <View>
-        <TouchableOpacity onPress={() => uploadImage(index)} style={styles.blankPhoto}>
-          {photo.uri 
+        <TouchableOpacity onPress={() => uploadImage(index, existing)} style={styles.blankPhoto}>
+          {existing 
             ? 
             <Image style={styles.avatar} source={photo} />
             :
