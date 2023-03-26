@@ -36,7 +36,7 @@ export default function AdoptorHomePage(props) {
             const species = user.user.preferences.petType ? [user.user.preferences.petType] : petTypeArray
             if(likedAndDislikedUsers >= 1){
               return query(
-                collection(db, 'users'), 
+                collection(db, 'newUserTable'), 
                 where('type', '==', 'Adoptee'), 
                 where('userUID', 'not-in', fitleredOut),
                 where('pet.species', 'in', species),
@@ -44,7 +44,7 @@ export default function AdoptorHomePage(props) {
               )
             } else{
               return query(
-                collection(db, 'users'), 
+                collection(db, 'newUserTable'), 
                 where('type', '==', 'Adoptee'),
                 where('pet.species', 'in', species),
                 where('pet.age', '==', user.user.preferences.petAge)
@@ -52,9 +52,9 @@ export default function AdoptorHomePage(props) {
             }            
           } else {
             if(likedAndDislikedUsers >= 1){
-              return query(collection(db, 'users'), where('type', '==', 'Adoptee'), where('userUID', 'not-in', fitleredOut))
+              return query(collection(db, 'newUserTable'), where('type', '==', 'Adoptee'), where('userUID', 'not-in', fitleredOut))
             } else{
-              return query(collection(db, 'users'), where('type', '==', 'Adoptee'))
+              return query(collection(db, 'newUserTable'), where('type', '==', 'Adoptee'))
             }
           }      
       } 
@@ -86,7 +86,7 @@ export default function AdoptorHomePage(props) {
       const likedProfiles =  [].concat(user?.user?.likedProfiles ?? []).concat(likedThisSession).concat(uid)
       setLikedThisSession([...likedThisSession, uid])
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", user.uid), { likedProfiles});
+        transaction.update(doc(db, "newUserTable", user.uid), { likedProfiles});
       });
       console.log("Transaction likeUser successfully committed!");
       setIndex(index + 1)
@@ -100,7 +100,7 @@ export default function AdoptorHomePage(props) {
       const dislikedProfiles =  [].concat(user?.user?.likedProfiles ?? []).concat(dislikedThisSession).concat(uid)
       setDislikedThisSession([...dislikedThisSession, uid])
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", user.uid), {  dislikedProfiles});
+        transaction.update(doc(db, "newUserTable", user.uid), {  dislikedProfiles});
       });
       console.log("Transaction dislikeUser successfully committed!");
       setIndex(index + 1)

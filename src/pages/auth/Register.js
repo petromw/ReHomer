@@ -23,7 +23,7 @@ export default function Register(props) {
       try {
         const newUser = await createUserWithEmailAndPassword(auth, email, password)
           try {
-            const docRef = await addDoc(collection(db, "users"), {
+            const docRef = await addDoc(collection(db, "newUserTable"), {
               name,
               email, 
               userUID: newUser.user.uid,

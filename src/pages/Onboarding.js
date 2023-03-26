@@ -37,7 +37,7 @@ export default function OnBoarding() {
   const updateUser = async (type) => {
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { type: type});
+        transaction.update(doc(db, "newUserTable", uid), { type: type});
       });
       dispatch(setUser({...user, type: type}))
       console.log("Transaction successfully committed!");
@@ -49,7 +49,7 @@ export default function OnBoarding() {
   const updateUserName = async () => {
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { name: name });
+        transaction.update(doc(db, "newUserTable", uid), { name: name });
       });
       dispatch(setUser( { ...user, name: name }))
 
@@ -64,7 +64,7 @@ export default function OnBoarding() {
     try {
       
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { pet: {name: petName, species: petSpecies} });
+        transaction.update(doc(db, "newUserTable", uid), { pet: {name: petName, species: petSpecies} });
       });
       dispatch(setUser({...user,   pet: {
         name: petName, species: petSpecies
@@ -87,11 +87,11 @@ export default function OnBoarding() {
         if(type !== 'Adoptee'){
           updateUser(type)
           await runTransaction(db, async (transaction) => {
-            transaction.update(doc(db, "users", uid), { adoptorFields: adoptorFields});
+            transaction.update(doc(db, "newUserTable", uid), { adoptorFields: adoptorFields});
           });
         }
         await runTransaction(db, async (transaction) => {
-          transaction.update(doc(db, "users", uid), { onboardingComplete: true });
+          transaction.update(doc(db, "newUserTable", uid), { onboardingComplete: true });
         });
         dispatch(completeOnboardingReduxAction(true))
         console.log("Transaction successfully committed!");
@@ -116,7 +116,7 @@ export default function OnBoarding() {
     try {
       const petImages = (user?.pet?.images && user?.pet?.images?.length) > 0 ? [].concat(user.pet.images).concat(result.uri) : [result.uri]
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages, profileImage: petImages[0]} });
+        transaction.update(doc(db, "newUserTable", uid), { pet: {...user.pet, images: petImages, profileImage: petImages[0]} });
       });
 
       dispatch(setUser({...user, pet: {...user.pet, images: petImages}} ))

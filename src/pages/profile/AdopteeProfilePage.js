@@ -57,7 +57,7 @@ export default function AdopteeProfile() {
   const updateUser = async (field) => {
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), field);
+        transaction.update(doc(db, "newUserTable", uid), field);
       });
       dispatch(setUser({...user, field}))
       console.log("Transaction successfully committed!");
@@ -85,7 +85,7 @@ export default function AdopteeProfile() {
       }
       const petImages = (userImages && userImages.length) > 0 ? [].concat(userImages).concat(result.uri) : [result.uri]
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages} });
+        transaction.update(doc(db, "newUserTable", uid), { pet: {...user.pet, images: petImages} });
       });
 
       dispatch(setUser({...user, pet: {...user.pet, images: petImages}} ))
@@ -105,10 +105,10 @@ export default function AdopteeProfile() {
     });
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { ...user, profilePicture: result.uri });
+        transaction.update(doc(db, "newUserTable", uid), { ...user, profilePicture: result.uri });
       });
 
-      dispatch(setUser({...user, profilePicture: result } ))
+      dispatch(setUser({...user, profilePicture: result.uri } ))
 
       console.log("Transaction successfully committed!");
     } catch (e) {
