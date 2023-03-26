@@ -65,7 +65,7 @@ export default function MatchSection(props) {
       const likes = [].concat(user?.user?.likedProfiles ?? [])
        
       const otherUsers =   await getDocs(query(
-        collection(db, 'users'), 
+        collection(db, 'newUserTable'), 
           where('userUID', 'in', likes),
           
         )) 
@@ -73,7 +73,7 @@ export default function MatchSection(props) {
         liked.push(user.data())
       })
       const matchesQuery =   await getDocs(query(
-        collection(db, 'users'), 
+        collection(db, 'newUserTable'), 
           where('userUID', 'in', likes),
           where('likedProfiles', 'array-contains', user.user.userUID)
         )) 

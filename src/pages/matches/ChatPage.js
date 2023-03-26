@@ -56,7 +56,7 @@ const ChatPage = () => {
     try {
     const fetchedMessages = await getDocs(query(
       collection(db, 'messageGroups'), 
-        where('users', 'array-contains', user.user.userUID),       
+        where('newUserTable', 'array-contains', user.user.userUID),       
       )) 
       fetchedMessages.forEach((group) => {
         if(group.data().users.includes(chattingWith.userUID)){
