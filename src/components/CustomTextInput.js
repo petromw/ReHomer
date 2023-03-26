@@ -8,7 +8,7 @@ import {  IconButton } from 'react-native-paper';
 import { Input } from '@rneui/themed';
 
 
-  const CustomTextInput = ({value, setValue, updateValue}) => {
+  const CustomTextInput = ({value, setValue, updateValue, label}) => {
     const [editable, setEditable] = useState(false)
     const blur = () => {
       updateValue()
@@ -18,8 +18,8 @@ import { Input } from '@rneui/themed';
     if(editable) {
       return (
         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginHorizontal: 15, width: '80%'}}>
+           {label && <Text></Text>}
            <Input
-           
                  value={value}
                  defaultValue={value}
                  labelStyle={{color:'#0f0d14' }}

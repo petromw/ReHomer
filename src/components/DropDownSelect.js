@@ -1,44 +1,46 @@
 import React, { useState } from 'react';
   import { StyleSheet, Text, View } from 'react-native';
   import { Dropdown } from 'react-native-element-dropdown';
+import {  IconButton } from 'react-native-paper';
 
-  const DropdownComponent = ({data,  value, setValue}) => {
+
+  const DropdownComponent = ({data,  value, setValue, canBeEditable}) => {
     const [isFocus, setIsFocus] = useState(false);
-
-    const renderLabel = () => {
-      if (value || isFocus) {
-        return (
-          <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-            Dropdown label
-          </Text>
-        );
-      }
-      return null;
-    };
-
+    const [editable, setEditable] = useState(false)
     return (
       <View style={styles.container}>
-        {/* {renderLabel()} */}
-        <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={data}
-          // search
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? 'Select item' : '...'}
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={item => {
-            setValue(item.value);
-            setIsFocus(false);
-          }}
-        />
+
+        {canBeEditable && !editable ? 
+          <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={styles.name}>{value}</Text>
+            <IconButton onPress={() => setEditable(!editable)}  size={20}  color={'#000000'} icon={'pencil'}/>
+          </View> 
+        : 
+          <View style={{width: '85%'}}>
+            <Dropdown
+              style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={data}
+              // search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus ? 'Select item' : '...'}
+              value={value}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={item => {
+                setValue(item.value);
+                setIsFocus(false);
+              }}
+            />
+          </View>
+        }
+        
+        {canBeEditable && editable ?  <IconButton onPress={() => setEditable(!editable)}  size={20}  color={'#000000'} icon={'pencil'}/> : <></>}
       </View>
     );
   };
@@ -48,6 +50,8 @@ import React, { useState } from 'react';
   const styles = StyleSheet.create({
     container: {
       padding: 16,
+      display: 'flex',
+      flexDirection: 'row'
     },
     dropdown: {
       height: 50,

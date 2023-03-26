@@ -13,7 +13,7 @@ import { Button, IconButton } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg'
 import { Input } from '@rneui/themed';
-import { runTransaction ,getFirestore, doc} from 'firebase/firestore';
+import { runTransaction, getFirestore, doc} from 'firebase/firestore';
 import { setUser } from '../../redux/userSlice';
 import CustomTextInput from '../../components/CustomTextInput';
 import * as ImagePicker from 'expo-image-picker';
@@ -104,9 +104,8 @@ export default function AdopteeProfile() {
       quality: 1,
     });
     try {
-      
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { ...user,profilePicture: result.uri });
+        transaction.update(doc(db, "users", uid), { ...user, profilePicture: result.uri });
       });
 
       dispatch(setUser({...user, profilePicture: result } ))
@@ -126,9 +125,13 @@ export default function AdopteeProfile() {
 
       <View style={styles.container}>
         <View style={styles.header}/>
-          <TouchableOpacity onPress={() => uploadProfileImage()}>
-            <Image onPress={() => uploadProfileImage()} style={styles.avatar} source={profileImage} />          
-          </TouchableOpacity>
+            <Image style={styles.avatar} source={profileImage} />          
+            <IconButton
+              icon="camera"
+              size={30}
+              style={styles.iconButton}
+              onPress={() => uploadProfileImage()}
+            />
           <View style={styles.bodyContent}>
           
           <CustomTextInput updateValue={() => updateUser({ name: name })} value={name} setValue={setName}/>
@@ -165,16 +168,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#4d4365',
     height:200,
   },
+  iconButton: {
+    width: 130,
+    height: 130,
+    marginBottom: 10,
+    position: 'absolute',
+    marginTop: 180,
+    marginLeft: 165
+  },
   avatar: {
     width: 130,
     height: 130,
     borderRadius: 63,
     borderWidth: 4,
-    borderColor: "white",
-    marginBottom:10,
-    alignSelf:'center',
+    borderColor: 'white',
+    marginBottom: 10,
+    alignSelf: 'center',
     position: 'absolute',
-    top: -75
+    marginTop: 130,
   },
   name:{
     fontSize:500,
