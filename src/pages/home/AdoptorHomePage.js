@@ -1,9 +1,10 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, StyleSheet } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { collection, getDocs, getFirestore, query, where, runTransaction, doc} from "firebase/firestore";
 import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
+import { Icon } from '@rneui/themed';
 import { petTypeArray } from '../../utils';
 import {getDistance, getPreciseDistance} from 'geolib';
 
@@ -132,8 +133,8 @@ export default function AdoptorHomePage(props) {
   
   return (
     <View style={{flex: 1, padding: '15%', alignItems: 'flex-end'}}>
-      <Button onPress={() => navigation.navigate('Preferences')}>Preferences</Button>
-      <View style={{flex: 1, justifyContent: 'space-between', alignItems: 'center', marginTop: '25%', marginBottom: '5%'}}>
+      <Button  mode='contained' onPress={() => navigation.navigate('Preferences')}>Preferences</Button>
+      <View style={styles.container}>
         <View>
           <Text style={{fontSize: 24}}>Owner: {otherUserProfiles[index]?.name}</Text>
           <Text style={{fontSize: 24}}>Pet: {otherUserProfiles[index]?.pet?.name}</Text>
@@ -141,16 +142,16 @@ export default function AdoptorHomePage(props) {
         </View>
         <View>
           {
-            otherUserProfiles[index]?.pet?.profileImage ?  
+            otherUserProfiles[index]?.pet?.images ?  
             <Image 
-            source={ {uri: otherUserProfiles[index]?.pet?.profileImage}}
-            style={{
-              width: 300,
-              height: 300,
-            }} 
-          /> 
-          :
-          <Text>No image avalible</Text>
+              source={ otherUserProfiles[index]?.pet?.images}
+              style={{
+                width: 300,
+                height: 300,
+              }} 
+            /> 
+            :
+            <Text>No image avalible</Text>
           }
         
         </View>
@@ -162,3 +163,19 @@ export default function AdoptorHomePage(props) {
     </View>
   )
 }
+
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginTop: '20%', 
+    borderWidth: 3,
+    padding: 5,
+    borderColor: '#cdcdcd',
+    borderRadius: 5,
+    minWidth: '100%'
+  },
+});

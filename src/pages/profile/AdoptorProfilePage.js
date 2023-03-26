@@ -1,46 +1,114 @@
 import { getAuth } from 'firebase/auth';
-import React, { Component } from 'react';
+import React, { Component , useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Image,
-  TouchableOpacity
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import blankProfile from '../../assets/blankProfile.jpg'
-
+import CustomTextInput from '../../components/CustomTextInput';
+import { runTransaction ,getFirestore, doc} from 'firebase/firestore';
+import { setUser } from '../../redux/userSlice';
+import DropdownComponent from '../../components/DropDownSelect';
+import { familyTypeArray, houseTypeArray } from '../../utils';
+import * as ImagePicker from 'expo-image-picker';
 
 
 export default function AdoptorProfile() {
   const user = useSelector((state) => state.user.user)
-  const profileImage = user?.profileImage ? {uri: user?.profileImage} : blankProfile
+  const profilePicture = user?.profilePicture ? {uri: user?.profilePicture} : blankProfile
+  const uid =  useSelector((state) => state.user.uid)
+
+  const db = getFirestore()
+  const dispatch = useDispatch()
+
+  const [name, setName] = useState('')
+  const [familyType, setFamilyType] = useState()
+  const [houseType, setHouseType] = useState()
+
+  useEffect(() => {
+    setName(user?.name)
+    setFamilyType(user?.adoptorFields?.familyType)
+    setHouseType(user?.adoptorFields?.houseType)
+  }, [])
 
   const auth = getAuth();
+  const updateUser = async (field) => {
+    try {
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", uid), field);
+      });
+      dispatch(setUser({...user, field}))
+      console.log("Transaction successfully committed!");
+    } catch (e) {
+      console.error("Transaction update user failed: ", e);
+    }
+  }
 
+  const uploadProfileImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    try {
+      await runTransaction(db, async (transaction) => {
+        transaction.update(doc(db, "users", uid), { ...user, profilePicture: result.uri });
+      });
+
+      dispatch(setUser({...user, profilePicture: result } ))
+
+      console.log("Transaction successfully committed!");
+    } catch (e) {
+      console.error("Transaction uploadImage failed: ", e);
+    }
+  }
+
+  useEffect(() => {
+    if(familyType && houseType){
+      updateUser({adoptorFields: {familyType, houseType}})
+    }
+  }, [familyType, houseType])
 
   return (
-    <View style={styles.container}>
-          <View style={styles.header}>
-            {/* <View style={{ marginTop: '15%', alignSelf: 'flex-end', marginRight: '5%'}}>
-              <IconButton size={50} mode={'contained'} color={'#000000'} icon={'account'}/>
-            </View> */}
-            
-          </View>
-          <Image style={styles.avatar} source={profileImage} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+    <ScrollView>
+   
+      <View style={styles.container}>
+          <View style={styles.header}/>
+            <Image style={styles.avatar} source={profilePicture} />
+            <IconButton
+              icon="camera"
+              size={30}
+              style={styles.iconButton}
+              onPress={() => uploadProfileImage()}
+            />
           <View style={styles.bodyContent}>
-            <Text style={styles.name}>{user?.name}</Text>
-            
-            
+            <CustomTextInput updateValue={() => updateUser({ name: name })} value={name} setValue={setName}/>           
           </View>
-
-          <View style={{marginTop: '85%', width: '75%', alignSelf: 'center'}}>
+          <View style={{padding: 15}}>
+            <DropdownComponent canBeEditable={true} data={familyTypeArray.map((familyType) => {return {label: familyType, value: familyType}})} value={familyType ?? 'Set your family type'} setValue={setFamilyType}/>
+            <DropdownComponent canBeEditable={true} data={houseTypeArray.map((houseType) => {return {label: houseType, value: houseType}})} value={houseType ?? 'Set your house type'} setValue={setHouseType}/>
+          
+          </View>
+          <View style={{marginTop: 65, width: '75%', alignSelf: 'center'}}>
               <Button mode='contained' onPress={() => auth.signOut()}>
                 Sign Out
               </Button>
             </View>
       </View>
+      
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -54,11 +122,19 @@ const styles = StyleSheet.create({
     height: 130,
     borderRadius: 63,
     borderWidth: 4,
-    borderColor: "white",
-    marginBottom:10,
-    alignSelf:'center',
+    borderColor: 'white',
+    marginBottom: 10,
+    alignSelf: 'center',
     position: 'absolute',
-    marginTop:130
+    marginTop: 130,
+  },
+  iconButton: {
+    width: 130,
+    height: 130,
+    marginBottom: 10,
+    position: 'absolute',
+    marginTop: 180,
+    marginLeft: 165
   },
   name:{
     fontSize:500,

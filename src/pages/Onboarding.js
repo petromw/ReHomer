@@ -12,7 +12,7 @@ import CustomRadioButton from '../components/CustomRadioButton';
 import { LinearProgress } from '@rneui/themed/dist/LinearProgress';
 import CustomLinearProgress from '../components/CustomLinearProgress';
 import * as ImagePicker from 'expo-image-picker';
-import { houseTypeArray, petTypeArray } from '../utils';
+import { houseTypeArray, petTypeArray, familyTypeArray } from '../utils';
 
 
 
@@ -124,9 +124,6 @@ export default function OnBoarding() {
     } catch (e) {
       console.error("Transaction uploadImage failed: ", e);
     }
-   
-
-
   };
   
   
