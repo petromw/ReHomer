@@ -1,9 +1,9 @@
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { getAuth } from "firebase/auth";
 import { useSelector, useDispatch } from 'react-redux'
 import { decrement, increment } from '../../redux/userSlice'
-import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
+import { collection, getDocs, getFirestore, query, where, runTransaction, doc } from "firebase/firestore";
 import { IconButton , Button} from 'react-native-paper';
 
 
@@ -122,7 +122,7 @@ export default function AdopteeHomePage(props) {
   return (
     <View style={{flex: 1, padding: '15%', alignItems: 'flex-end'}}>
       <Button onPress={() => navigation.navigate('Preferences')}>Preferences</Button>
-      <View style={{flex: 1, justifyContent: 'space-between', alignItems: 'center', marginTop: '25%', marginBottom: '5%'}}>
+      <View style={styles.container}>
         <Text style={{fontSize: 24}}>{otherUserProfiles[index]?.name}</Text>
         <Text style={{fontSize: 22, textAlign: 'center', marginTop: 25}}>Has a {otherUserProfiles[index]?.adoptorFields?.houseType}</Text>
         <Text style={{fontSize: 22, textAlign: 'center', marginTop: 25}}>with {otherUserProfiles[index]?.adoptorFields?.familyType}</Text>
@@ -134,3 +134,17 @@ export default function AdopteeHomePage(props) {
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginTop: '20%', 
+    borderWidth: 3,
+    padding: 5,
+    borderColor: '#cdcdcd',
+    borderRadius: 5,
+    minWidth: '100%'
+  },
+});
