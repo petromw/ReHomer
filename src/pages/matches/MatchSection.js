@@ -122,7 +122,7 @@ export default function MatchSection(props) {
           <ScrollView horizontal style={{maxHeight: 100}}>
           {likedUsers.map((match) => (
               <View key={match.userUID} style={styles.likesContainer}>
-                <Image source={match.profileImage ? {uri: match.profileImage} : blankProfile} style={styles.profilePicture} />
+                <Image source={match.profilePicture ? {uri: match.profilePicture} : blankProfile} style={styles.profilePicture} />
                 <Text style={styles.matchName}>{match.name}</Text>
               </View>
             ))} 
@@ -137,7 +137,7 @@ export default function MatchSection(props) {
           matches.map((match) => (
             <TouchableOpacity onPress={() => handleMatchPress(match)} key={match.userUID}>
               <View style={styles.matchContainer}>
-                <Image source={match.profileImage ? {uri: match.profileImage} : blankProfile} style={styles.profilePicture} />
+                <Image source={match.profilePicture ? {uri: match.profilePicture} : blankProfile} style={styles.profilePicture} />
                 <Text style={styles.matchName}>{match.name}</Text>
               </View>
             </TouchableOpacity>

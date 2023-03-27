@@ -27,10 +27,6 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([])
   const [messageGroup, setMessageGroup] = useState({})
 
-  useEffect(() => {
-    console.log(messageGroup)
-  }, [messageGroup])
-
  useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -56,13 +52,13 @@ const ChatPage = () => {
     try {
     const fetchedMessages = await getDocs(query(
       collection(db, 'messageGroups'), 
-        where('newUserTable', 'array-contains', user.user.userUID),       
+        where('users', 'array-contains', user.user.userUID),       
       )) 
       fetchedMessages.forEach((group) => {
         if(group.data().users.includes(chattingWith.userUID)){
-          if(group.id){
+          if(group.data.id){
             setMessageGroup(group)
-          }
+          } 
           group.data().messages.forEach((mesg) => {
             messageArray.push(mesg)
           })
@@ -70,14 +66,13 @@ const ChatPage = () => {
       })
       return messageArray
     } catch (error) {
-      console.error(error)
+      console.error(`Error fetching messages ${error}`)
       return null
     }
   }
 
   const createNewMessageGroup = async () => {
     try { 
-     
       const messageGroupsRef = await addDoc(collection(db, "messageGroups"), {
         messages: [],
         users: [user.user.userUID, chattingWith.userUID]
@@ -91,7 +86,6 @@ const ChatPage = () => {
   }
 
   useEffect(() => {
-    console.log('Getting Messages')
     const load = async() => {
       const messageArray = await getMessages()
       if(!messageGroup.id && messageArray.length <= 0){
