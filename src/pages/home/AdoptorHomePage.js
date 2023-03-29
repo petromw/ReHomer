@@ -1,11 +1,11 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { collection, getDocs, getFirestore, query, where, runTransaction, doc} from "firebase/firestore";
+import { collection, getDocs, getFirestore, query, where, runTransaction, doc, firebase} from "firebase/firestore";
 import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
 import { Icon } from '@rneui/themed';
-import { petTypeArray } from '../../utils';
+import { petAgeArray, petTypeArray } from '../../utils';
 
 
 
@@ -34,20 +34,19 @@ export default function AdoptorHomePage(props) {
       const queryFiltered = (likedAndDislikedUsers) => {
           if(user.user.preferences){
             const species = user.user.preferences.petType ? [user.user.preferences.petType] : petTypeArray
+            const petAges = user.user.preferences.petAge ? [user.user.preferences.petAge] : petAgeArray
             if(likedAndDislikedUsers >= 1){
               return query(
                 collection(db, 'newUserTable'), 
                 where('type', '==', 'Adoptee'), 
                 where('userUID', 'not-in', fitleredOut),
                 where('pet.species', 'in', species),
-                where('pet.age', '==', user.user.preferences.petAge)
               )
             } else{
               return query(
                 collection(db, 'newUserTable'), 
                 where('type', '==', 'Adoptee'),
                 where('pet.species', 'in', species),
-                where('pet.age', '==', user.user.preferences.petAge)
               )
             }            
           } else {
@@ -78,7 +77,7 @@ export default function AdoptorHomePage(props) {
       }
     }
     load()
-  }, [db, user])
+  }, [db, user, firebase])
 
   
   const likeUser = async (uid) => {
@@ -90,6 +89,7 @@ export default function AdoptorHomePage(props) {
       });
       console.log("Transaction likeUser successfully committed!");
       setIndex(index + 1)
+      
     } catch (e) {
       console.error("Transaction likeUser failed: ", e);
     }

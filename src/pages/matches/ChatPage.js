@@ -27,10 +27,6 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([])
   const [messageGroup, setMessageGroup] = useState({})
 
-  useEffect(() => {
-    console.log(messageGroup)
-  }, [messageGroup])
-
  useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -56,13 +52,13 @@ const ChatPage = () => {
     try {
     const fetchedMessages = await getDocs(query(
       collection(db, 'messageGroups'), 
-        where('newUserTable', 'array-contains', user.user.userUID),       
+        where('users', 'array-contains', user.user.userUID),       
       )) 
       fetchedMessages.forEach((group) => {
         if(group.data().users.includes(chattingWith.userUID)){
           if(group.id){
             setMessageGroup(group)
-          }
+          } 
           group.data().messages.forEach((mesg) => {
             messageArray.push(mesg)
           })
@@ -70,14 +66,13 @@ const ChatPage = () => {
       })
       return messageArray
     } catch (error) {
-      console.error(error)
+      console.error(`Error fetching messages ${error}`)
       return null
     }
   }
 
   const createNewMessageGroup = async () => {
     try { 
-     
       const messageGroupsRef = await addDoc(collection(db, "messageGroups"), {
         messages: [],
         users: [user.user.userUID, chattingWith.userUID]
@@ -90,35 +85,33 @@ const ChatPage = () => {
     } 
   }
 
+  const load = async() => {
+    const messageArray = await getMessages()
+    if(!messageGroup.id && messageArray.length <= 0){
+      await createNewMessageGroup() 
+    } 
+    const sorted = messageArray.sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt))
+    setMessages(sorted ?? [])
+  }
+
   useEffect(() => {
-    console.log('Getting Messages')
-    const load = async() => {
-      const messageArray = await getMessages()
-      if(!messageGroup.id && messageArray.length <= 0){
-        await createNewMessageGroup()
-      }
-      const sorted = messageArray.sort((a, b) => a.sentAt - b.sentAt)
-      setMessages(sorted ?? [])
-    }
     if(user.user.userUID && chattingWith && db){
-      load()
-    }
-  }, [user, chattingWith, db])
+      load() 
+    } 
+  }, [user, chattingWith, db, firebase])
   
 
 
   const sendMessage = async () => {
     setNewMessageText('')
     try {
-      const newMessages =  (messages ?? []).concat([{message: newMessageText, sentBy: user.user.userUID, sentAt: new Date()}])
       
-      setMessages(newMessages)
+      const newMessages =  (messages ?? []).concat([{message: newMessageText, sentBy: user.user.userUID, sentAt: new Date()}])
         await runTransaction(db, async (transaction) => {
           transaction.update(doc(db, "messageGroups", messageGroup.id), { messages: newMessages});
         });
-        
-      
-      
+         
+        load()
       
     } catch (e) {
       console.error("Transaction send message failed: ", e);
@@ -126,7 +119,7 @@ const ChatPage = () => {
   };
 
 
-  return (
+  return ( 
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>

@@ -7,6 +7,8 @@ import { ThemeProvider, Button, createTheme } from '@rneui/themed';
 import store from './src/redux/store'
 import { Provider } from 'react-redux'
 import Main from './Main';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs()
 
 const theme = createTheme({
   components: {

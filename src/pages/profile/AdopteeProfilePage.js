@@ -31,6 +31,7 @@ export default function AdopteeProfile() {
   const [name, setName] = useState('')
   const [petName, setPetName] = useState('')
   const [images, setImages] = useState([])
+  const [petBio, setPetBio] = useState('')
   const auth = getAuth();
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function AdopteeProfile() {
   useEffect(() => {
     setName(user?.name)
     setPetName(user?.pet.name)
+    setPetBio(user?.pet?.bio)
     const imagesToSet = user?.pet?.images.map((img) => {return {uri: img}})
     if(imagesToSet.length < 6){
       setImages(imagesToSet)
@@ -139,6 +141,8 @@ export default function AdopteeProfile() {
           <View style={styles.mainBody}>
             <Text style={[styles.name, {textDecorationLine: 'underline'}]}>Pet</Text>
           <CustomTextInput updateValue={() => updateUser({pet: {...user.pet, name: petName}})} value={petName} setValue={setPetName}/>
+          <CustomTextInput updateValue={() => updateUser({pet: {...user.pet, bio: petBio}})} small={true} emptyValue={!petBio ? 'Write a bio for your pet': ''} value={petBio} setValue={setPetBio}/>
+          
           <View style={styles.imagesContainer}>
             {images.map((image, index) => {
               return (
