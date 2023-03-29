@@ -58,6 +58,7 @@ export default function OnBoarding() {
       console.error("Transaction failed: ", e);
     }
   }
+
   
 
   const createPet = async () => {

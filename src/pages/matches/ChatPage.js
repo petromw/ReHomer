@@ -56,7 +56,7 @@ const ChatPage = () => {
       )) 
       fetchedMessages.forEach((group) => {
         if(group.data().users.includes(chattingWith.userUID)){
-          if(group.data.id){
+          if(group.id){
             setMessageGroup(group)
           } 
           group.data().messages.forEach((mesg) => {
@@ -85,34 +85,33 @@ const ChatPage = () => {
     } 
   }
 
+  const load = async() => {
+    const messageArray = await getMessages()
+    if(!messageGroup.id && messageArray.length <= 0){
+      await createNewMessageGroup() 
+    } 
+    const sorted = messageArray.sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt))
+    setMessages(sorted ?? [])
+  }
+
   useEffect(() => {
-    const load = async() => {
-      const messageArray = await getMessages()
-      if(!messageGroup.id && messageArray.length <= 0){
-        await createNewMessageGroup()
-      }
-      const sorted = messageArray.sort((a, b) => a.sentAt - b.sentAt)
-      setMessages(sorted ?? [])
-    }
     if(user.user.userUID && chattingWith && db){
-      load()
-    }
-  }, [user, chattingWith, db])
+      load() 
+    } 
+  }, [user, chattingWith, db, firebase])
   
 
 
   const sendMessage = async () => {
     setNewMessageText('')
     try {
-      const newMessages =  (messages ?? []).concat([{message: newMessageText, sentBy: user.user.userUID, sentAt: new Date()}])
       
-      setMessages(newMessages)
+      const newMessages =  (messages ?? []).concat([{message: newMessageText, sentBy: user.user.userUID, sentAt: new Date()}])
         await runTransaction(db, async (transaction) => {
           transaction.update(doc(db, "messageGroups", messageGroup.id), { messages: newMessages});
         });
-        
-      
-      
+         
+        load()
       
     } catch (e) {
       console.error("Transaction send message failed: ", e);
@@ -120,7 +119,7 @@ const ChatPage = () => {
   };
 
 
-  return (
+  return ( 
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>

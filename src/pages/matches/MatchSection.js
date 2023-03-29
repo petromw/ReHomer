@@ -103,7 +103,7 @@ export default function MatchSection(props) {
       }
     }
     load()
-  }, [db])
+  }, [db,navigation])
 
   const handleMatchPress = (match) => {
     navigation.navigate("ChatPage")
@@ -133,8 +133,9 @@ export default function MatchSection(props) {
           <Divider />
         <Text style={styles.subtitle}>Matches</Text>
         
-          {matches.length > 0 ? 
+        {matches.length > 0 ? 
           matches.map((match) => (
+            
             <TouchableOpacity onPress={() => handleMatchPress(match)} key={match.userUID}>
               <View style={styles.matchContainer}>
                 <Image source={match.profilePicture ? {uri: match.profilePicture} : blankProfile} style={styles.profilePicture} />
