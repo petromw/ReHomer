@@ -1,10 +1,10 @@
-import { View, Text,Image } from 'react-native'
+import { View, Text } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { getAuth } from "firebase/auth";
 import { useSelector, useDispatch } from 'react-redux'
-import { completeOnboardingReduxAction, setUser } from '../redux/userSlice'
+import { completeOnboardingReduxAction } from '../redux/userSlice'
 import { Button, Input } from '@rneui/themed';
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, runTransaction, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getFirestore, query, runTransaction, where } from 'firebase/firestore';
 import { Card, Switch } from '@rneui/base';
 import { Divider, RadioButton } from 'react-native-paper';
 import DropdownComponent from '../components/DropDownSelect';
@@ -23,13 +23,10 @@ export default function OnBoarding() {
   const [name, setName] = useState('')
   const [petName, setPetName] = useState('')
   const [petSpecies, setPetSpecies] = useState('')
-  const [adoptorFields, setAdoptorFields] = useState({houseType: '', familyType: ''})
 
   const [type, setType] = useState('Adoptor')
-  // const totalSteps = type === 'Adoptor' ? 3 : 2
-  const totalSteps =  3
+  const totalSteps = type === 'Adoptor' ? 1 : 2
 
-  const auth = getAuth();
   const dispatch = useDispatch()
   
   const db = getFirestore()
@@ -39,23 +36,25 @@ export default function OnBoarding() {
       await runTransaction(db, async (transaction) => {
         transaction.update(doc(db, "newUserTable", uid), { type: type});
       });
-      dispatch(setUser({...user, type: type}))
       console.log("Transaction successfully committed!");
     } catch (e) {
-      console.error("Transaction failed: ", e);
+      console.log("Transaction failed: ", e);
     }
   }
+
+  useEffect(() => {
+    updateUser(type)
+  }, [type])
   
   const updateUserName = async () => {
     try {
       await runTransaction(db, async (transaction) => {
         transaction.update(doc(db, "newUserTable", uid), { name: name });
       });
-      dispatch(setUser( { ...user, name: name }))
-
+      
       console.log("Transaction successfully committed!");
     } catch (e) {
-      console.error("Transaction failed: ", e);
+      console.log("Transaction failed: ", e);
     }
   }
 
@@ -63,28 +62,28 @@ export default function OnBoarding() {
 
   const createPet = async () => {
     try {
-      
+        const docRef = await addDoc(collection(db, "pet"), {
+          name: petName,
+          species: petSpecies
+        });
+        
       await runTransaction(db, async (transaction) => {
         transaction.update(doc(db, "newUserTable", uid), { pet: {name: petName, species: petSpecies} });
       });
-      dispatch(setUser({...user,   pet: {
-        name: petName, species: petSpecies
-      } }))
-
+      
       console.log("Transaction successfully committed!");
     } catch (e) {
-      console.error("Transaction failed: ", e);
+      console.log("Transaction failed: ", e);
     }
   }
 
   const completeOnboarding = async () => {
-    if(step === 2 && type === 'Adoptee'){
-      createPet()
-    }
+    if(step === 2) createPet()
     if(step < totalSteps) {
       setStep(step + 1)
     } else {
       try {
+        createPet()
         if(type !== 'Adoptee'){
           updateUser(type)
           await runTransaction(db, async (transaction) => {
@@ -97,7 +96,7 @@ export default function OnBoarding() {
         dispatch(completeOnboardingReduxAction(true))
         console.log("Transaction successfully committed!");
       } catch (e) {
-        console.error("Transaction failed: ", e);
+        console.log("Transaction failed: ", e);
       }
     }
     
@@ -131,10 +130,9 @@ export default function OnBoarding() {
   
 
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550', padding: 25, paddingTop: 100}}>
-      <CustomLinearProgress percentage={(step / totalSteps) * 85}/>
-      {
-        step > 1 &&
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#4d436550', padding: 25}}>
+      <Text style={{position: 'absolute', right: 50, top: 50}}>{step + 1} / {totalSteps + 1} </Text>
+      {step === 0 &&
         <View>
           <Text style={{fontSize: 18}}>
             {type}

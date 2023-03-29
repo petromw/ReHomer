@@ -19,5 +19,6 @@ export default function HomePage(props) {
         (<AdoptorHomePage {...props}/>)
       }
     </View>
+    
   )
 }

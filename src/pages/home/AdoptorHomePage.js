@@ -5,7 +5,8 @@ import { collection, getDocs, getFirestore, query, where, runTransaction, doc, f
 import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
 import { Icon } from '@rneui/themed';
-import { petAgeArray, petTypeArray } from '../../utils';
+import {getDistance, getPreciseDistance} from 'geolib';
+import { petAgeArray, petTypeArray } from '../../utils';  
 
 
 
@@ -30,7 +31,6 @@ export default function AdoptorHomePage(props) {
     try {
       const users = []
       const fitleredOut = [].concat(user?.user?.likedProfiles ?? []).concat(user?.user?.dislikedProfiles ?? []) 
-       
       const queryFiltered = (likedAndDislikedUsers) => {
           if(user.user.preferences){
             const species = user.user.preferences.petType ? [user.user.preferences.petType] : petTypeArray
@@ -67,15 +67,18 @@ export default function AdoptorHomePage(props) {
       return null
     }
   }
+  console.log(user?.user.lat)
 
-
+  
   useEffect(() => {
     const load = async() => {
       const users = await getOtherUsers()
       if(users && users.length > 0){
+        
         setOtherUserProfiles(users)
       }
     }
+
     load()
   }, [db, user, firebase])
 
@@ -108,7 +111,6 @@ export default function AdoptorHomePage(props) {
       console.error("Transaction dislikeUser failed: ", e);
     }
   };
-
   if(index > otherUserProfiles.length - 1){
     return (
     <View style={{flex: 1, padding: '15%', alignItems: 'flex-end'}}>

@@ -4,6 +4,7 @@ import {NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import LoginScreen from './src/pages/auth/Login';
+import MapPage from './src/pages/Map'
 import RegisterScreen from './src/pages/auth/Register';
 import HomePage from './src/pages/home/HomePage';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -120,7 +121,16 @@ const Main  = () =>  {
               name="Profile" 
               component={Profile} 
             />
-           
+            <Tab.Screen  
+              options={{
+                tabBarLabel: '',
+                tabBarIcon: () => (
+                  <MaterialCommunityIcons name="map" color={'#fff'} size={26} />
+                ),
+                }} 
+              name="Map" 
+              component={MapPage} 
+            />
           </Tab.Navigator>
         </NavigationContainer>
         )
