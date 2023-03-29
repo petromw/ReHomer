@@ -31,6 +31,7 @@ export default function AdopteeProfile() {
   const [name, setName] = useState('')
   const [petName, setPetName] = useState('')
   const [images, setImages] = useState([])
+  const [petBio, setPetBio] = useState('')
   const auth = getAuth();
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function AdopteeProfile() {
   useEffect(() => {
     setName(user?.name)
     setPetName(user?.pet.name)
+    setPetBio(user?.pet?.bio)
     const imagesToSet = user?.pet?.images.map((img) => {return {uri: img}})
     if(imagesToSet.length < 6){
       setImages(imagesToSet)
@@ -57,7 +59,7 @@ export default function AdopteeProfile() {
   const updateUser = async (field) => {
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), field);
+        transaction.update(doc(db, "newUserTable", uid), field);
       });
       dispatch(setUser({...user, field}))
       console.log("Transaction successfully committed!");
@@ -85,7 +87,7 @@ export default function AdopteeProfile() {
       }
       const petImages = (userImages && userImages.length) > 0 ? [].concat(userImages).concat(result.uri) : [result.uri]
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { pet: {...user.pet, images: petImages} });
+        transaction.update(doc(db, "newUserTable", uid), { pet: {...user.pet, images: petImages} });
       });
 
       dispatch(setUser({...user, pet: {...user.pet, images: petImages}} ))
@@ -105,10 +107,10 @@ export default function AdopteeProfile() {
     });
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { ...user, profilePicture: result.uri });
+        transaction.update(doc(db, "newUserTable", uid), { ...user, profilePicture: result.uri });
       });
 
-      dispatch(setUser({...user, profilePicture: result } ))
+      dispatch(setUser({...user, profilePicture: result.uri } ))
 
       console.log("Transaction successfully committed!");
     } catch (e) {
@@ -139,6 +141,8 @@ export default function AdopteeProfile() {
           <View style={styles.mainBody}>
             <Text style={[styles.name, {textDecorationLine: 'underline'}]}>Pet</Text>
           <CustomTextInput updateValue={() => updateUser({pet: {...user.pet, name: petName}})} value={petName} setValue={setPetName}/>
+          <CustomTextInput updateValue={() => updateUser({pet: {...user.pet, bio: petBio}})} small={true} emptyValue={!petBio ? 'Write a bio for your pet': ''} value={petBio} setValue={setPetBio}/>
+          
           <View style={styles.imagesContainer}>
             {images.map((image, index) => {
               return (

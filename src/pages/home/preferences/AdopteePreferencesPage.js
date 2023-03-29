@@ -40,7 +40,7 @@ export default function AdopteePreferencesPage() {
     try {
       
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), {preferences: {...user.preferences, ...dto} });
+        transaction.update(doc(db, "newUserTable", uid), {preferences: {...user.preferences, ...dto} });
       });
       dispatch(setUser( {...user, preferences: {...user.preferences, ...dto} }))
 

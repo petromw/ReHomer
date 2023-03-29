@@ -41,7 +41,7 @@ export default function AdoptorProfile() {
   const updateUser = async (field) => {
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), field);
+        transaction.update(doc(db, "newUserTable", uid), field);
       });
       dispatch(setUser({...user, field}))
       console.log("Transaction successfully committed!");
@@ -59,10 +59,10 @@ export default function AdoptorProfile() {
     });
     try {
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", uid), { ...user, profilePicture: result.uri });
+        transaction.update(doc(db, "newUserTable", uid), { ...user, profilePicture: result.uri });
       });
 
-      dispatch(setUser({...user, profilePicture: result } ))
+      dispatch(setUser({...user, profilePicture: result.uri } ))
 
       console.log("Transaction successfully committed!");
     } catch (e) {

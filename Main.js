@@ -43,7 +43,7 @@ const Main  = () =>  {
         dispatch(setLoggedIn(true))
         const uid = user.uid;
         try {
-          const users = await getDocs(query(collection(db, 'users'), where('userUID', '==', uid )))
+          const users = await getDocs(query(collection(db, 'newUserTable'), where('userUID', '==', uid )))
           users.forEach((doc) => {
             if(doc.data().userUID === uid){
               if(!selectUser.email){

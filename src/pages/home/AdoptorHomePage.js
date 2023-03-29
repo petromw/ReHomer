@@ -1,12 +1,13 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { collection, getDocs, getFirestore, query, where, runTransaction, doc} from "firebase/firestore";
+import { collection, getDocs, getFirestore, query, where, runTransaction, doc, firebase} from "firebase/firestore";
 import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
 import { Icon } from '@rneui/themed';
-import { petTypeArray } from '../../utils';
 import {getDistance, getPreciseDistance} from 'geolib';
+import { petAgeArray, petTypeArray } from '../../utils';  
+
 
 
 
@@ -33,35 +34,26 @@ export default function AdoptorHomePage(props) {
       const queryFiltered = (likedAndDislikedUsers) => {
           if(user.user.preferences){
             const species = user.user.preferences.petType ? [user.user.preferences.petType] : petTypeArray
+            const petAges = user.user.preferences.petAge ? [user.user.preferences.petAge] : petAgeArray
             if(likedAndDislikedUsers >= 1){
               return query(
-                collection(db, 'users'), 
+                collection(db, 'newUserTable'), 
                 where('type', '==', 'Adoptee'), 
                 where('userUID', 'not-in', fitleredOut),
                 where('pet.species', 'in', species),
-                where('pet.age', '==', user.user.preferences.petAge),
-                where(getPreciseDistance(
-                  { latitude: 'lat', longitude: 'long' },
-                  { latitude: user.user.lat, longitude: user.user.long }
-                ) <= user.user.preferences.distance))
-              
+              )
             } else{
               return query(
-                collection(db, 'users'), 
+                collection(db, 'newUserTable'), 
                 where('type', '==', 'Adoptee'),
                 where('pet.species', 'in', species),
-                where('pet.age', '==', user.user.preferences.petAge),
-                where(getPreciseDistance(
-                  { latitude: 'lat', longitude: 'long' },
-                  { latitude: user.user.lat, longitude: user.user.long }
-                ) <= user.user.preferences.distance)
               )
             }            
           } else {
             if(likedAndDislikedUsers >= 1){
-              return query(collection(db, 'users'), where('type', '==', 'Adoptee'), where('userUID', 'not-in', fitleredOut))
+              return query(collection(db, 'newUserTable'), where('type', '==', 'Adoptee'), where('userUID', 'not-in', fitleredOut))
             } else{
-              return query(collection(db, 'users'), where('type', '==', 'Adoptee'))
+              return query(collection(db, 'newUserTable'), where('type', '==', 'Adoptee'))
             }
           }      
       } 
@@ -88,9 +80,7 @@ export default function AdoptorHomePage(props) {
     }
 
     load()
-  }, [db, user])
-    
-  
+  }, [db, user, firebase])
 
   
   const likeUser = async (uid) => {
@@ -98,10 +88,11 @@ export default function AdoptorHomePage(props) {
       const likedProfiles =  [].concat(user?.user?.likedProfiles ?? []).concat(likedThisSession).concat(uid)
       setLikedThisSession([...likedThisSession, uid])
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", user.uid), { likedProfiles});
+        transaction.update(doc(db, "newUserTable", user.uid), { likedProfiles});
       });
       console.log("Transaction likeUser successfully committed!");
       setIndex(index + 1)
+      
     } catch (e) {
       console.error("Transaction likeUser failed: ", e);
     }
@@ -112,7 +103,7 @@ export default function AdoptorHomePage(props) {
       const dislikedProfiles =  [].concat(user?.user?.likedProfiles ?? []).concat(dislikedThisSession).concat(uid)
       setDislikedThisSession([...dislikedThisSession, uid])
       await runTransaction(db, async (transaction) => {
-        transaction.update(doc(db, "users", user.uid), {  dislikedProfiles});
+        transaction.update(doc(db, "newUserTable", user.uid), {  dislikedProfiles});
       });
       console.log("Transaction dislikeUser successfully committed!");
       setIndex(index + 1)

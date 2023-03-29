@@ -65,7 +65,7 @@ export default function MatchSection(props) {
       const likes = [].concat(user?.user?.likedProfiles ?? [])
        
       const otherUsers =   await getDocs(query(
-        collection(db, 'users'), 
+        collection(db, 'newUserTable'), 
           where('userUID', 'in', likes),
           
         )) 
@@ -73,7 +73,7 @@ export default function MatchSection(props) {
         liked.push(user.data())
       })
       const matchesQuery =   await getDocs(query(
-        collection(db, 'users'), 
+        collection(db, 'newUserTable'), 
           where('userUID', 'in', likes),
           where('likedProfiles', 'array-contains', user.user.userUID)
         )) 
@@ -103,7 +103,7 @@ export default function MatchSection(props) {
       }
     }
     load()
-  }, [db])
+  }, [db,navigation])
 
   const handleMatchPress = (match) => {
     navigation.navigate("ChatPage")
@@ -122,7 +122,7 @@ export default function MatchSection(props) {
           <ScrollView horizontal style={{maxHeight: 100}}>
           {likedUsers.map((match) => (
               <View key={match.userUID} style={styles.likesContainer}>
-                <Image source={match.profileImage ? {uri: match.profileImage} : blankProfile} style={styles.profilePicture} />
+                <Image source={match.profilePicture ? {uri: match.profilePicture} : blankProfile} style={styles.profilePicture} />
                 <Text style={styles.matchName}>{match.name}</Text>
               </View>
             ))} 
@@ -133,11 +133,12 @@ export default function MatchSection(props) {
           <Divider />
         <Text style={styles.subtitle}>Matches</Text>
         
-          {matches.length > 0 ? 
+        {matches.length > 0 ? 
           matches.map((match) => (
+            
             <TouchableOpacity onPress={() => handleMatchPress(match)} key={match.userUID}>
               <View style={styles.matchContainer}>
-                <Image source={match.profileImage ? {uri: match.profileImage} : blankProfile} style={styles.profilePicture} />
+                <Image source={match.profilePicture ? {uri: match.profilePicture} : blankProfile} style={styles.profilePicture} />
                 <Text style={styles.matchName}>{match.name}</Text>
               </View>
             </TouchableOpacity>

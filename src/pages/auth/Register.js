@@ -27,7 +27,7 @@ export default function Register(props) {
           try {
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location);
-            const docRef = await addDoc(collection(db, "users"), {
+            const docRef = await addDoc(collection(db, "newUserTable"), {
               name,
               email, 
               userUID: newUser.user.uid,

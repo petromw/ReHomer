@@ -8,7 +8,7 @@ import {  IconButton } from 'react-native-paper';
 import { Input } from '@rneui/themed';
 
 
-  const CustomTextInput = ({value, setValue, updateValue, label}) => {
+  const CustomTextInput = ({value, setValue, updateValue, label, small, emptyValue}) => {
     const [editable, setEditable] = useState(false)
     const blur = () => {
       updateValue()
@@ -18,7 +18,7 @@ import { Input } from '@rneui/themed';
     if(editable) {
       return (
         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginHorizontal: 15, width: '80%'}}>
-           {label && <Text></Text>}
+           {label && <Text>{label}</Text>}
            <Input
                  value={value}
                  defaultValue={value}
@@ -35,7 +35,8 @@ import { Input } from '@rneui/themed';
     )} else {
       return (
       <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-        <Text style={styles.name}>{value}</Text>
+        {emptyValue && <Text style={small ? styles.smallText : styles.name}>{emptyValue}</Text>}
+        <Text style={small ? styles.smallText : styles.name}>{value}</Text>
         <IconButton onPress={() => setEditable(!editable)}  size={20}  color={'#000000'} icon={'pencil'}/>
       </View>
     )
@@ -62,5 +63,9 @@ import { Input } from '@rneui/themed';
       color: "#696969",
       fontWeight: "600"
     },
+    smallText: {
+      fontSize:20,
+      color: "#696969",
+    }
   });
   
