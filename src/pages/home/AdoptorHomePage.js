@@ -6,7 +6,7 @@ import { Button, IconButton } from 'react-native-paper'
 import {  setUser } from '../../redux/userSlice'
 import { Icon } from '@rneui/themed';
 import {getDistance, getPreciseDistance} from 'geolib';
-import { petAgeArray, petTypeArray } from '../../utils';  
+import { petAgeArray, petTypeArray } from '../../utils';
 
 
 
@@ -41,12 +41,22 @@ export default function AdoptorHomePage(props) {
                 where('type', '==', 'Adoptee'), 
                 where('userUID', 'not-in', fitleredOut),
                 where('pet.species', 'in', species),
-              )
+                where('pet.age', 'in', petAges),
+                where(getPreciseDistance(
+                  { latitude: 'lat', longitude: 'long' },
+                  { latitude: user.user.lat, longitude: user.user.long }
+                ) <= user.user.preferences.distance))
+              
             } else{
               return query(
                 collection(db, 'newUserTable'), 
                 where('type', '==', 'Adoptee'),
                 where('pet.species', 'in', species),
+                where('pet.age', '==', user.user.preferences.petAge),
+                where(getPreciseDistance(
+                  { latitude: 'lat', longitude: 'long' },
+                  { latitude: user.user.lat, longitude: user.user.long }
+                ) <= user.user.preferences.distance)
               )
             }            
           } else {
